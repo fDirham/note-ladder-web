@@ -28,4 +28,56 @@ export default class AuthController {
       return {};
     }
   }
+
+  static async logOut(accessToken: string) {
+    try {
+      const config = {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      };
+      await axios.put(
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/out`,
+        {},
+        config
+      );
+      return true;
+    } catch (error) {
+      console.log(error);
+      return false;
+    }
+  }
+
+  static async validateCredentials(email: string, displayName: string) {
+    try {
+      const validateRes = await axios.put(
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/validate/credentials`,
+        {
+          email,
+          displayName,
+        }
+      );
+      return validateRes.data;
+    } catch (error) {
+      console.log(error);
+      return {};
+    }
+  }
+
+  static async signUp(email: string, password: string, displayName: string) {
+    try {
+      const signUpRes = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/auth`,
+        {
+          email,
+          password,
+          displayName,
+        }
+      );
+      return signUpRes.data;
+    } catch (error) {
+      console.log(error);
+      return {};
+    }
+  }
 }

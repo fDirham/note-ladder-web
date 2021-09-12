@@ -1,6 +1,6 @@
 import create, { GetState, SetState } from "zustand";
 import { devtools, persist } from "zustand/middleware";
-import R from "ramda";
+import * as R from "ramda";
 
 export type authStateType = {
   displayName?: string;
@@ -15,10 +15,10 @@ export type authStateType = {
 const log: typeof devtools = (config) => (set, get, api) =>
   config(
     (args) => {
-      //console.log("Z: old state", get())
-      //console.log("Z: applying", args)
+      console.log("Z: old state", get());
+      console.log("Z: applying", args);
       set(args);
-      //console.log("Z: new state", get())
+      console.log("Z: new state", get());
     },
     get,
     api
