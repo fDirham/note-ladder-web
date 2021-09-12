@@ -1,13 +1,13 @@
+import SignIn from "components/SignIn";
 import Head from "next/head";
 import Image from "next/image";
+import { useState } from "react";
 import AuthController from "../controllers/AuthController";
-import styles from "../styles/Home.module.css";
+import styles from "../styles/Home.module.scss";
 
 export default function Home() {
-  function lol() {
-    const what = process.env.NEXT_PUBLIC_API_KEY;
-    console.log(what);
-  }
+  const [signUp, setSignUp] = useState<boolean>(false);
+
   return (
     <div className={styles.container}>
       <Head>
@@ -19,8 +19,8 @@ export default function Home() {
       <main className={styles.main}>
         <h1 className={styles.title}>Note Ladder</h1>
 
-        <div onClick={lol}>
-          <div>{process.env.NEXT_PUBLIC_API_KEY}</div>
+        <div>
+          <SignIn onSignUp={() => setSignUp(true)} />
         </div>
       </main>
 
