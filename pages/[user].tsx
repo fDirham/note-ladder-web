@@ -5,13 +5,19 @@ import { useRouter } from "next/dist/client/router";
 import React, { useEffect, useState } from "react";
 import { user } from "types/users";
 import styles from "styles/User.module.scss";
-import LaddersList from "components/LaddersList";
+import RungsList from "components/RungsList";
 
+const dummyLadders = ["ladder1", "some text", "wtf man", "HAHAHAHHA"];
 export default function UserPage() {
   const router = useRouter();
   const authState: authStateType = useAuthState();
   const { user: currentDisplayName } = router.query;
-  const [currentUser, setCurrentUser] = useState<user>();
+  const [currentUser, setCurrentUser] = useState<user>({
+    displayName: currentDisplayName as string,
+    uid: "",
+    email: "",
+    ladders: dummyLadders,
+  });
 
   useEffect(() => {
     getCurrentUser();
@@ -45,12 +51,21 @@ export default function UserPage() {
     return currentUser.uid === authState.uid;
   }
 
+  function updateUserLadder(newLadders: string[]) {
+    const newUser = { ...currentUser };
+    newUser.ladders = newLadders;
+    setCurrentUser(newUser);
+  }
+
   if (!currentUser) return <div>Loading...</div>;
   return (
     <div className={styles.container}>
       <h1>{currentDisplayName}</h1>
       {isUser() && <button onClick={logOut}>Logout</button>}
-      <LaddersList ladders={currentUser.ladders || []} />
+      <RungsList
+        ladders={currentUser.ladders || []}
+        updateLadders={updateUserLadder}
+      />
     </div>
   );
 }
