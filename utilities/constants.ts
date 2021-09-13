@@ -1,1 +1,1 @@
-export const tempRung = "naniWA&&89223kiLL";
+export const tempRungName = "naniWA&&89223kiLL";

@@ -1,6 +1,8 @@
+import { ladder } from "./ladders";
+
 export type user = {
   displayName: string;
   email: string;
   uid: string;
-  ladders?: string[]; // Full of ladder names
+  ladders?: ladder[]; // Full of ladder names
 };

@@ -1,11 +1,16 @@
 import React, { useEffect } from "react";
 import { useDrag } from "react-dnd";
 import { itemTypes } from "types/dnd";
+import { rung } from "types/ladders";
 import styles from "./RungBlock.module.scss";
 
 type RungBlockProps = {
-  rung: string;
-  setMovingRung: (rung: string) => void;
+  rung: rung;
+  setMovingRung: (rungId: string) => void;
+  editing: boolean;
+  setEditing: (rungId: string) => void;
+  onEdit?: (newRung: rung) => void;
+  onClick?: (rung: string) => void;
 };
 
 export default function RungBlock(props: RungBlockProps) {
@@ -17,7 +22,7 @@ export default function RungBlock(props: RungBlockProps) {
   }));
 
   useEffect(() => {
-    props.setMovingRung(props.rung);
+    props.setMovingRung(props.rung.id);
   }, [isDragging]);
 
   return (
@@ -27,7 +32,7 @@ export default function RungBlock(props: RungBlockProps) {
         isDragging ? styles.containerIsDragging : ""
       }`}
     >
-      {props.rung}
+      {props.rung.content}
     </div>
   );
 }

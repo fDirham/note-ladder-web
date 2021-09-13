@@ -9,6 +9,7 @@ import styles from "./RungSpacer.module.scss";
 type RungSpacerProps = {
   prevRung: number;
   setDroppedSpacer: (prevNumber: number) => void;
+  addNewRung: (order: number) => void;
 };
 
 export default function RungSpacer(props: RungSpacerProps) {
@@ -32,6 +33,7 @@ export default function RungSpacer(props: RungSpacerProps) {
       ref={drop}
       className={styles.container}
       style={{ backgroundColor: isOver ? "red" : "blue" }}
+      onClick={() => props.addNewRung(props.prevRung + 1)}
     ></div>
   );
 }

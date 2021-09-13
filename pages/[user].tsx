@@ -6,18 +6,27 @@ import React, { useEffect, useState } from "react";
 import { user } from "types/users";
 import styles from "styles/User.module.scss";
 import RungsList from "components/RungsList";
+import { ladder } from "types/ladders";
+import LaddersList from "components/LaddersList";
 
-const dummyLadders = ["ladder1", "some text", "wtf man", "HAHAHAHHA"];
+const dummyLadders: ladder[] = [
+  { name: "ladder1", order: 0, id: "test0" },
+  { name: "sometext", order: 1, id: "test1" },
+  { name: "lol wtf HUH", order: 2, id: "test2" },
+  { name: "HAHAHAHAH", order: 3, id: "test3" },
+];
+
 export default function UserPage() {
   const router = useRouter();
   const authState: authStateType = useAuthState();
   const { user: currentDisplayName } = router.query;
-  const [currentUser, setCurrentUser] = useState<user>({
+  const dummyUser: user = {
     displayName: currentDisplayName as string,
     uid: "",
     email: "",
     ladders: dummyLadders,
-  });
+  };
+  const [currentUser, setCurrentUser] = useState<user>(dummyUser);
 
   useEffect(() => {
     getCurrentUser();
@@ -46,12 +55,23 @@ export default function UserPage() {
     router.push("/");
   }
 
+  function addNewLadder(order: number) {
+    const newLadders = [...currentUser.ladders];
+    const newLadder: ladder = {
+      order,
+      name: "new",
+      id: "new-ladder",
+    };
+    newLadders.splice(order, 0, newLadder);
+    updateUserLadders(newLadders);
+  }
+
   function isUser() {
     if (!currentUser || !authState.uid) return false;
     return currentUser.uid === authState.uid;
   }
 
-  function updateUserLadder(newLadders: string[]) {
+  function updateUserLadders(newLadders: ladder[]) {
     const newUser = { ...currentUser };
     newUser.ladders = newLadders;
     setCurrentUser(newUser);
@@ -62,9 +82,12 @@ export default function UserPage() {
     <div className={styles.container}>
       <h1>{currentDisplayName}</h1>
       {isUser() && <button onClick={logOut}>Logout</button>}
-      <RungsList
+      {isUser() && <button onClick={() => addNewLadder(0)}>New ladder</button>}
+      <LaddersList
         ladders={currentUser.ladders || []}
-        updateLadders={updateUserLadder}
+        updateLadders={updateUserLadders}
+        addNewLadder={addNewLadder}
+        onLadderClick={console.log}
       />
     </div>
   );
