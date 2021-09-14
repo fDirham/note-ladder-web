@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { rung } from "types/ladders";
+import { rung } from "types/rungs";
 import { tempRungName } from "utilities/constants";
 import RungBlock from "./RungBlock";
 import styles from "./RungsList.module.scss";
@@ -94,6 +94,7 @@ export default function RungsList(props: RungsListProps) {
               onEdit={handleEdit}
               onDelete={handleDelete}
               rungValidator={props.rungValidator}
+              onClick={props.onRungClick}
             />
             <RungSpacer
               key={`spacer-${index}`}

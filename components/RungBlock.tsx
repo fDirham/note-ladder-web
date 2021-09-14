@@ -7,7 +7,7 @@ import React, {
 } from "react";
 import { useDrag } from "react-dnd";
 import { itemTypes } from "types/dnd";
-import { rung } from "types/ladders";
+import { rung } from "types/rungs";
 import styles from "./RungBlock.module.scss";
 
 type RungBlockProps = {
@@ -16,7 +16,7 @@ type RungBlockProps = {
   editing: boolean;
   setEditingRungId: (rungId: string) => void;
   onEdit?: (newRung: rung) => void;
-  onClick?: (rungId: string) => void;
+  onClick?: (rung: rung) => void;
   onDelete?: (rungId: string) => void;
   rungValidator: (rung: rung) => boolean;
 };
@@ -66,6 +66,7 @@ export default function RungBlock(props: RungBlockProps) {
         isDragging ? styles.containerIsDragging : ""
       } ${props.rung.new ? styles.containerNew : ""}`}
       onBlur={handleChangeContent}
+      onClick={() => props.onClick(props.rung)}
     >
       {!props.editing ? (
         stateContent

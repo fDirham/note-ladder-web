@@ -5,8 +5,7 @@ import { useRouter } from "next/dist/client/router";
 import React, { useEffect, useState } from "react";
 import { user } from "types/users";
 import styles from "styles/User.module.scss";
-import RungsList from "components/RungsList";
-import { ladder } from "types/ladders";
+import { ladder } from "types/rungs";
 import LaddersList from "components/LaddersList";
 
 export default function UserPage() {
@@ -37,7 +36,7 @@ export default function UserPage() {
     const retrievedUser = await UserController.getUser(
       currentDisplayName as string
     );
-    if (!retrievedUser) return handleNotFound();
+    if (!retrievedUser.uid) return handleNotFound();
     setCurrentUser(retrievedUser);
   }
 

@@ -22,6 +22,26 @@ export type note = {
   new?: boolean;
 };
 
+export function noteToRung(note: note): rung {
+  return {
+    content: note.content,
+    order: note.order,
+    id: note.id,
+    author: note.author,
+    new: note.new,
+  };
+}
+
+export function notesToRungs(notes: note[]): rung[] {
+  const processedData: rung[] = [];
+
+  notes.forEach((note: note) => {
+    processedData.push(noteToRung(note));
+  });
+
+  return processedData;
+}
+
 export function ladderToRung(ladder: ladder): rung {
   return {
     content: ladder.name,
@@ -57,6 +77,26 @@ export function rungsToLadders(rungs: rung[]): ladder[] {
 
   rungs.forEach((rung: rung) => {
     processedData.push(rungToLadder(rung));
+  });
+
+  return processedData;
+}
+
+export function rungToNote(rung: rung): note {
+  return {
+    content: rung.content,
+    order: rung.order,
+    id: rung.id,
+    author: rung.author,
+    new: rung.new,
+  };
+}
+
+export function rungsToNotes(rungs: rung[]): note[] {
+  const processedData: note[] = [];
+
+  rungs.forEach((rung: rung) => {
+    processedData.push(rungToNote(rung));
   });
 
   return processedData;

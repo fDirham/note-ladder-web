@@ -6,7 +6,7 @@ import {
   rung,
   rungsToLadders,
   rungToLadder,
-} from "types/ladders";
+} from "types/rungs";
 import RungsList from "./RungsList";
 import { authStateType, useAuthState } from "globalStates/useAuthStore";
 import { useRouter } from "next/dist/client/router";
@@ -33,7 +33,9 @@ export default function LaddersList(props: LaddersListProps) {
     props.addNewLadder(order);
   }
 
-  function onRungClick(rung: rung) {}
+  function onRungClick(rung: rung) {
+    router.push(`/${router.query.user}/${rung.id}`);
+  }
 
   async function saveNewRung(newRung: rung) {
     const newLadder = rungToLadder(newRung);

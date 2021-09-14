@@ -1,4 +1,4 @@
-import { ladder } from "./ladders";
+import { ladder } from "./rungs";
 
 export type user = {
   displayName: string;
