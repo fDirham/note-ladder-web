@@ -13,6 +13,7 @@ type RungsListProps = {
   onRungClick?: (rung: rung) => void;
   editingRungId: string;
   setEditingRungId: (newId: string) => void;
+  rungValidator: (rung: rung) => boolean;
 };
 
 export default function RungsList(props: RungsListProps) {
@@ -44,7 +45,6 @@ export default function RungsList(props: RungsListProps) {
       newRungs.findIndex((e) => e.id === tempRung.id),
       1
     );
-    console.log(newRungs);
     setMovingRungId(undefined);
     setDroppedSpacer(undefined);
     props.updateRungs(newRungs);
@@ -93,6 +93,7 @@ export default function RungsList(props: RungsListProps) {
               setEditingRungId={props.setEditingRungId}
               onEdit={handleEdit}
               onDelete={handleDelete}
+              rungValidator={props.rungValidator}
             />
             <RungSpacer
               key={`spacer-${index}`}

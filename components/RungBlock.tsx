@@ -1,4 +1,10 @@
-import React, { FormEvent, useEffect, useState } from "react";
+import React, {
+  ChangeEvent,
+  ChangeEventHandler,
+  FormEvent,
+  useEffect,
+  useState,
+} from "react";
 import { useDrag } from "react-dnd";
 import { itemTypes } from "types/dnd";
 import { rung } from "types/ladders";
@@ -12,6 +18,7 @@ type RungBlockProps = {
   onEdit?: (newRung: rung) => void;
   onClick?: (rungId: string) => void;
   onDelete?: (rungId: string) => void;
+  rungValidator: (rung: rung) => boolean;
 };
 
 export default function RungBlock(props: RungBlockProps) {
@@ -41,6 +48,13 @@ export default function RungBlock(props: RungBlockProps) {
     stopEditing();
   }
 
+  function handleChange(e: ChangeEvent<HTMLInputElement>) {
+    const { value } = e.target;
+    const newRung = { ...props.rung };
+    newRung.content = value;
+    if (!props.rungValidator(newRung)) return;
+    setStateContent(value);
+  }
   function stopEditing() {
     props.setEditingRungId(undefined);
   }
@@ -50,7 +64,7 @@ export default function RungBlock(props: RungBlockProps) {
       ref={drag}
       className={`${styles.container} ${
         isDragging ? styles.containerIsDragging : ""
-      }`}
+      } ${props.rung.new ? styles.containerNew : ""}`}
       onBlur={handleChangeContent}
     >
       {!props.editing ? (
@@ -61,11 +75,10 @@ export default function RungBlock(props: RungBlockProps) {
             autoFocus
             type="text"
             value={stateContent}
-            onChange={(e) => setStateContent(e.target.value)}
+            onChange={handleChange}
           />
         </form>
       )}
-      {props.rung.new && "new"}
     </div>
   );
 }

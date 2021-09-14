@@ -9,17 +9,19 @@ import {
 } from "types/ladders";
 import RungsList from "./RungsList";
 import { authStateType, useAuthState } from "globalStates/useAuthStore";
+import { useRouter } from "next/dist/client/router";
+import { validateAlphanumeric } from "utilities/validation";
 
 type LaddersListProps = {
   ladders: ladder[];
   updateLadders?: (newLadders: ladder[]) => void;
   addNewLadder?: (order: number) => void;
-  onLadderClick?: (ladder: ladder) => void;
   editingLadderId: string;
   setEditingLadderId: (newId: string) => void;
 };
 
 export default function LaddersList(props: LaddersListProps) {
+  const router = useRouter();
   const authState: authStateType = useAuthState();
   useEffect(() => {}, [props.ladders]);
 
@@ -31,9 +33,7 @@ export default function LaddersList(props: LaddersListProps) {
     props.addNewLadder(order);
   }
 
-  function onRungClick(rung: rung) {
-    props.onLadderClick(rungToLadder(rung));
-  }
+  function onRungClick(rung: rung) {}
 
   async function saveNewRung(newRung: rung) {
     const newLadder = rungToLadder(newRung);
@@ -51,6 +51,10 @@ export default function LaddersList(props: LaddersListProps) {
     }
   }
 
+  function rungValidator(rung: rung) {
+    return rung.content.length < 30;
+  }
+
   return (
     <RungsList
       rungs={laddersToRungs(props.ladders)}
@@ -60,6 +64,7 @@ export default function LaddersList(props: LaddersListProps) {
       onRungClick={onRungClick}
       editingRungId={props.editingLadderId}
       setEditingRungId={props.setEditingLadderId}
+      rungValidator={rungValidator}
     />
   );
 }

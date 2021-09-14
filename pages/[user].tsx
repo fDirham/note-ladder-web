@@ -92,7 +92,6 @@ export default function UserPage() {
         ladders={currentUser.ladders || []}
         updateLadders={updateUserLadders}
         addNewLadder={addNewLadder}
-        onLadderClick={console.log}
         editingLadderId={editingLadderId}
         setEditingLadderId={setEditingLadderId}
       />
