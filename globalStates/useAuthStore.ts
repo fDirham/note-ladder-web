@@ -1,11 +1,13 @@
 import create, { GetState, SetState } from "zustand";
 import { devtools, persist } from "zustand/middleware";
 import * as R from "ramda";
+import { getAccessToken } from "./actions/authActions";
 
 export type authStateType = {
   displayName?: string;
   uid?: string;
   accessToken?: string;
+  getAccessToken: () => Promise<string>;
   setState: SetState<authStateType>;
   getState: GetState<authStateType>;
   resetState: () => void;
@@ -41,6 +43,7 @@ export const useAuthState = createStore(
       displayName: initialStoreValues.displayName,
       uid: initialStoreValues.uid,
       accessToken: initialStoreValues.accessToken,
+      getAccessToken: getAccessToken,
       setState: set,
       getState: get,
       resetState: () => set(initialStoreValues),

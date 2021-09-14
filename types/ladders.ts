@@ -2,25 +2,33 @@ export type ladder = {
   name: string;
   order: number;
   id: string;
+  author: string;
+  new?: boolean;
 };
 
 export type rung = {
   content: string;
   order: number;
   id: string;
+  author: string;
+  new?: boolean;
 };
 
 export type note = {
   content: string;
   order: number;
   id: string;
+  author: string;
+  new?: boolean;
 };
 
 export function ladderToRung(ladder: ladder): rung {
   return {
     content: ladder.name,
-    id: ladder.id,
     order: ladder.order,
+    id: ladder.id,
+    author: ladder.author,
+    new: ladder.new,
   };
 }
 
@@ -37,8 +45,10 @@ export function laddersToRungs(ladders: ladder[]): rung[] {
 export function rungToLadder(rung: rung): ladder {
   return {
     name: rung.content,
-    id: rung.id,
     order: rung.order,
+    id: rung.id,
+    author: rung.author,
+    new: rung.new,
   };
 }
 

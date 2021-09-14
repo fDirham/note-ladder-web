@@ -9,24 +9,24 @@ import RungsList from "components/RungsList";
 import { ladder } from "types/ladders";
 import LaddersList from "components/LaddersList";
 
-const dummyLadders: ladder[] = [
-  { name: "ladder1", order: 0, id: "test0" },
-  { name: "sometext", order: 1, id: "test1" },
-  { name: "lol wtf HUH", order: 2, id: "test2" },
-  { name: "HAHAHAHAH", order: 3, id: "test3" },
-];
-
 export default function UserPage() {
   const router = useRouter();
   const authState: authStateType = useAuthState();
   const { user: currentDisplayName } = router.query;
+  const dummyLadders: ladder[] = [
+    { name: "ladder1", order: 0, id: "test0", author: authState.uid },
+    { name: "sometext", order: 1, id: "test1", author: authState.uid },
+    { name: "lol wtf HUH", order: 2, id: "test2", author: authState.uid },
+    { name: "HAHAHAHAH", order: 3, id: "test3", author: authState.uid },
+  ];
   const dummyUser: user = {
     displayName: currentDisplayName as string,
     uid: "",
     email: "",
     ladders: dummyLadders,
   };
-  const [currentUser, setCurrentUser] = useState<user>(dummyUser);
+  const [currentUser, setCurrentUser] = useState<user>();
+  const [editingLadderId, setEditingLadderId] = useState<string>(); // Ladder id being edited
 
   useEffect(() => {
     getCurrentUser();
@@ -38,7 +38,6 @@ export default function UserPage() {
       currentDisplayName as string
     );
     if (!retrievedUser) return handleNotFound();
-    console.log(retrievedUser);
     setCurrentUser(retrievedUser);
   }
 
@@ -48,7 +47,8 @@ export default function UserPage() {
   }
 
   async function logOut() {
-    const logOutSuccess = await AuthController.logOut(authState.accessToken);
+    const accessToken = await authState.getAccessToken();
+    const logOutSuccess = await AuthController.logOut(accessToken);
     if (!logOutSuccess)
       return window.alert("Error logging out, try again later");
     authState.resetState();
@@ -59,11 +59,14 @@ export default function UserPage() {
     const newLadders = [...currentUser.ladders];
     const newLadder: ladder = {
       order,
-      name: "new",
-      id: "new-ladder",
+      name: "",
+      id: "new-ladder-" + Math.random(),
+      new: true,
+      author: authState.uid,
     };
     newLadders.splice(order, 0, newLadder);
     updateUserLadders(newLadders);
+    setEditingLadderId(newLadder.id);
   }
 
   function isUser() {
@@ -82,12 +85,16 @@ export default function UserPage() {
     <div className={styles.container}>
       <h1>{currentDisplayName}</h1>
       {isUser() && <button onClick={logOut}>Logout</button>}
-      {isUser() && <button onClick={() => addNewLadder(0)}>New ladder</button>}
+      {isUser() && !currentUser.ladders.length && (
+        <button onClick={() => addNewLadder(0)}>New ladder</button>
+      )}
       <LaddersList
         ladders={currentUser.ladders || []}
         updateLadders={updateUserLadders}
         addNewLadder={addNewLadder}
         onLadderClick={console.log}
+        editingLadderId={editingLadderId}
+        setEditingLadderId={setEditingLadderId}
       />
     </div>
   );
