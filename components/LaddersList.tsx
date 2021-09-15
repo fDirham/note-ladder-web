@@ -3,6 +3,7 @@ import React, { useEffect } from "react";
 import {
   ladder,
   laddersToRungs,
+  ladderToRung,
   rung,
   rungsToLadders,
   rungToLadder,
@@ -46,8 +47,8 @@ export default function LaddersList(props: LaddersListProps) {
         newLadder.order,
         accessToken
       );
-      if (!createdLadder.id) return null;
-      return createdLadder;
+      if (!createdLadder) return null;
+      return ladderToRung(createdLadder);
     } catch (error) {
       return null;
     }

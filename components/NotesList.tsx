@@ -11,13 +11,15 @@ import RungsList from "./RungsList";
 import { authStateType, useAuthState } from "globalStates/useAuthStore";
 import { useRouter } from "next/dist/client/router";
 import { validateAlphanumeric } from "utilities/validation";
+import NoteController from "controllers/NoteController";
 
 type NotesListProps = {
   notes: note[];
-  updateNotes?: (newNotes: note[]) => void;
-  addNewNote?: (order: number) => void;
+  updateNotes: (newNotes: note[]) => void;
+  addNewNote: (order: number) => void;
   editingNoteId: string;
   setEditingNoteId: (newId: string) => void;
+  ladderId: string;
 };
 
 export default function NotesList(props: NotesListProps) {
@@ -39,13 +41,14 @@ export default function NotesList(props: NotesListProps) {
     const newNote = rungToNote(newRung);
     try {
       const accessToken = await authState.getAccessToken();
-      // const createdNote = await NoteController.createNote(
-      //   newNote.name,
-      //   newNote.order,
-      //   accessToken
-      // );
-      // if (!createdNote.id) return null;
-      // return createdNote;
+      const createdNote = await NoteController.createNote(
+        newNote.content,
+        newNote.order,
+        props.ladderId,
+        accessToken
+      );
+      if (!createdNote.id) return null;
+      return createdNote;
     } catch (error) {
       return null;
     }

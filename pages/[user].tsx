@@ -36,7 +36,7 @@ export default function UserPage() {
     const retrievedUser = await UserController.getUser(
       currentDisplayName as string
     );
-    if (!retrievedUser.uid) return handleNotFound();
+    if (!retrievedUser) return handleNotFound();
     setCurrentUser(retrievedUser);
   }
 

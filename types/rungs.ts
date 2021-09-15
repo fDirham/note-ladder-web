@@ -4,6 +4,7 @@ export type ladder = {
   id: string;
   author: string;
   new?: boolean;
+  notes?: note[];
 };
 
 export type rung = {

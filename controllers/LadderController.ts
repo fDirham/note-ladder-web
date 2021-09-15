@@ -1,9 +1,12 @@
 import axios from "axios";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { firebaseAuth } from "firebaseApp";
+import { ladder } from "types/rungs";
 
 export default class LadderController {
-  static async createLadder(name: string, order: number, accessToken: string) {
+  static async createLadder(
+    name: string,
+    order: number,
+    accessToken: string
+  ): Promise<ladder | null> {
     try {
       const config = {
         headers: {
@@ -15,10 +18,25 @@ export default class LadderController {
         { name, order },
         config
       );
-      return createRes.data.ladder;
+      return createRes.data.ladder as ladder;
     } catch (error) {
       console.log(error);
-      return {};
+      return null;
+    }
+  }
+
+  static async getLadder(
+    authorId: string,
+    ladderId: string
+  ): Promise<ladder | null> {
+    try {
+      const getRes = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/ladder/${authorId}/${ladderId}`
+      );
+      return getRes.data.ladder as ladder;
+    } catch (error) {
+      console.log(error.response);
+      return null;
     }
   }
 }
