@@ -39,4 +39,29 @@ export default class LadderController {
       return null;
     }
   }
+
+  static async reorderLadder(
+    ladderId: string,
+    newOrder: number,
+    accessToken: string
+  ): Promise<ladder | null> {
+    try {
+      const config = {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      };
+
+      const reorderRes = await axios.put(
+        `${process.env.NEXT_PUBLIC_API_URL}/ladder/reorder`,
+        { ladderId, newOrder },
+        config
+      );
+
+      return reorderRes.data.ladder as ladder;
+    } catch (error) {
+      console.log(error.response);
+      return null;
+    }
+  }
 }

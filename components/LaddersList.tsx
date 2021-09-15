@@ -38,6 +38,12 @@ export default function LaddersList(props: LaddersListProps) {
     router.push(`/${router.query.user}/${rung.id}`);
   }
 
+  async function onRungMove(rung: rung) {
+    console.log("newOrder", rung.order);
+    const accessToken = await authState.getAccessToken();
+    await LadderController.reorderLadder(rung.id, rung.order, accessToken);
+  }
+
   async function saveNewRung(newRung: rung) {
     const newLadder = rungToLadder(newRung);
     try {
@@ -68,6 +74,7 @@ export default function LaddersList(props: LaddersListProps) {
       editingRungId={props.editingLadderId}
       setEditingRungId={props.setEditingLadderId}
       rungValidator={rungValidator}
+      onRungMove={onRungMove}
     />
   );
 }

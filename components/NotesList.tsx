@@ -37,6 +37,8 @@ export default function NotesList(props: NotesListProps) {
 
   function onRungClick(rung: rung) {}
 
+  async function onRungMove(rung: rung) {}
+
   async function saveNewRung(newRung: rung) {
     const newNote = rungToNote(newRung);
     try {
@@ -68,6 +70,7 @@ export default function NotesList(props: NotesListProps) {
       editingRungId={props.editingNoteId}
       setEditingRungId={props.setEditingNoteId}
       rungValidator={rungValidator}
+      onRungMove={onRungMove}
     />
   );
 }

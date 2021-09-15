@@ -7,13 +7,14 @@ import RungSpacer from "./RungSpacer";
 
 type RungsListProps = {
   rungs: rung[];
-  updateRungs?: (newRungs: rung[]) => void;
+  updateRungs: (newRungs: rung[]) => void;
   addNewRung: (order: number) => void;
   saveNewRung: (newRung: rung) => Promise<rung | null>;
-  onRungClick?: (rung: rung) => void;
+  onRungClick: (rung: rung) => void;
   editingRungId: string;
   setEditingRungId: (newId: string) => void;
   rungValidator: (rung: rung) => boolean;
+  onRungMove: (rung: rung) => Promise<void>;
 };
 
 export default function RungsList(props: RungsListProps) {
@@ -38,16 +39,24 @@ export default function RungsList(props: RungsListProps) {
       author: rungToMove.author,
     };
     newRungs.splice(rungIndex, 1, tempRung);
+
     // Add rung in place
     newRungs.splice(droppedSpacer + 1, 0, rungToMove);
+
     // Delete tempRung
     newRungs.splice(
       newRungs.findIndex((e) => e.id === tempRung.id),
       1
     );
+
     setMovingRungId(undefined);
     setDroppedSpacer(undefined);
     props.updateRungs(newRungs);
+
+    // Update order
+    const newOrder = newRungs.findIndex((e) => e.id === movingRungId);
+    rungToMove.order = newOrder;
+    props.onRungMove(rungToMove);
   }
 
   async function handleEdit(newRung: rung) {
