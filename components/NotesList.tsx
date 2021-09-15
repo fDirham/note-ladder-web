@@ -37,7 +37,16 @@ export default function NotesList(props: NotesListProps) {
 
   function onRungClick(rung: rung) {}
 
-  async function onRungMove(rung: rung) {}
+  async function onRungMove(rung: rung) {
+    console.log("newOrder", rung.order);
+    const accessToken = await authState.getAccessToken();
+    await NoteController.reorderNote(
+      rung.id,
+      props.ladderId,
+      rung.order,
+      accessToken
+    );
+  }
 
   async function saveNewRung(newRung: rung) {
     const newNote = rungToNote(newRung);

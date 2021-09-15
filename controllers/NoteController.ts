@@ -25,4 +25,30 @@ export default class NoteController {
       return null;
     }
   }
+
+  static async reorderNote(
+    noteId: string,
+    ladderId: string,
+    newOrder: number,
+    accessToken: string
+  ): Promise<note | null> {
+    try {
+      const config = {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      };
+
+      const reorderRes = await axios.put(
+        `${process.env.NEXT_PUBLIC_API_URL}/note/reorder`,
+        { noteId, ladderId, newOrder },
+        config
+      );
+
+      return reorderRes.data.note as note;
+    } catch (error) {
+      console.log(error.response);
+      return null;
+    }
+  }
 }
