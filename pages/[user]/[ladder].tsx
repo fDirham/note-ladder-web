@@ -5,11 +5,16 @@ import React, { useEffect, useState } from "react";
 import { ladder, note } from "types/rungs";
 import styles from "styles/Ladder.module.scss";
 import NotesList from "components/NotesList";
+import { user } from "types/users";
+import EditableLadderTitle from "components/EditableLadderTitle";
+import { authStateType, useAuthState } from "globalStates/useAuthStore";
 
 export default function LadderPage() {
   const router = useRouter();
   const { user: author, ladder } = router.query;
+  const authState: authStateType = useAuthState();
 
+  const [currentAuthorUser, setCurrentAuthorUser] = useState<user>();
   const [currentLadder, setCurrentLadder] = useState<ladder>();
   const [editingNoteId, setEditingNoteId] = useState<string>();
 
@@ -21,11 +26,11 @@ export default function LadderPage() {
     if (!author || !ladder || currentLadder) return;
     const retrievedUser = await UserController.getUser(author as string);
     if (!retrievedUser) return handleNotFound();
+    setCurrentAuthorUser(retrievedUser);
     const retrievedLadder = await LadderController.getLadder(
       retrievedUser.uid,
       ladder as string
     );
-    console.log("retrievedLadder", retrievedLadder);
     if (!retrievedLadder) return handleNotFound();
     setCurrentLadder(retrievedLadder);
   }
@@ -55,11 +60,26 @@ export default function LadderPage() {
     setCurrentLadder(newLadder);
   }
 
+  function goToUser() {
+    router.push(`/${currentAuthorUser.displayName}`);
+  }
+
+  async function handleChangeName(newName: string) {
+    const accessToken = await authState.getAccessToken();
+    const newLadder = { ...currentLadder };
+    newLadder.name = newName;
+    await LadderController.editLadder(currentLadder.id, newName, accessToken);
+  }
+
   if (!currentLadder) return <div>Loading...</div>;
   return (
     <div className={styles.container}>
-      userId: {currentLadder.author} <br />
-      ladder: {currentLadder.name}
+      <p onClick={goToUser}>userId: {currentLadder.author}</p>
+      <EditableLadderTitle
+        onSubmit={handleChangeName}
+        title={currentLadder.name}
+      />
+
       {(!currentLadder.notes || !currentLadder.notes.length) && (
         <button onClick={() => addNewNote(0)}>Add note</button>
       )}

@@ -12,6 +12,7 @@ import RungsList from "./RungsList";
 import { authStateType, useAuthState } from "globalStates/useAuthStore";
 import { useRouter } from "next/dist/client/router";
 import { validateAlphanumeric } from "utilities/validation";
+import { maxLadderNameLength } from "utilities/constants";
 
 type LaddersListProps = {
   ladders: ladder[];
@@ -39,7 +40,7 @@ export default function LaddersList(props: LaddersListProps) {
   }
 
   function rungValidator(rung: rung) {
-    return rung.content.length < 30;
+    return rung.content.length <= maxLadderNameLength;
   }
 
   async function saveNewRung(newRung: rung) {

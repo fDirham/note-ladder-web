@@ -12,6 +12,7 @@ import { authStateType, useAuthState } from "globalStates/useAuthStore";
 import { useRouter } from "next/dist/client/router";
 import { validateAlphanumeric } from "utilities/validation";
 import NoteController from "controllers/NoteController";
+import { maxNoteContentLength } from "utilities/constants";
 
 type NotesListProps = {
   notes: note[];
@@ -40,7 +41,7 @@ export default function NotesList(props: NotesListProps) {
   }
 
   function rungValidator(rung: rung) {
-    return rung.content.length < 30;
+    return rung.content.length <= maxNoteContentLength;
   }
 
   async function saveNewRung(newRung: rung) {
