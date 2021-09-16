@@ -77,4 +77,28 @@ export default class NoteController {
       return null;
     }
   }
+
+  static async deleteNote(
+    noteId: string,
+    ladderId: string,
+    accessToken: string
+  ): Promise<boolean> {
+    try {
+      const config = {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      };
+
+      const reorderRes = await axios.delete(
+        `${process.env.NEXT_PUBLIC_API_URL}/note/${ladderId}/${noteId}`,
+        config
+      );
+
+      return true;
+    } catch (error) {
+      console.log(error.response);
+      return false;
+    }
+  }
 }

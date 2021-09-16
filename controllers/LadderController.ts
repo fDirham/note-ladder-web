@@ -89,4 +89,27 @@ export default class LadderController {
       return null;
     }
   }
+
+  static async deleteLadder(
+    ladderId: string,
+    accessToken: string
+  ): Promise<boolean> {
+    try {
+      const config = {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      };
+
+      const reorderRes = await axios.delete(
+        `${process.env.NEXT_PUBLIC_API_URL}/ladder/${ladderId}`,
+        config
+      );
+
+      return true;
+    } catch (error) {
+      console.log(error.response);
+      return false;
+    }
+  }
 }

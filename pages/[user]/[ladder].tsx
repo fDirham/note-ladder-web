@@ -66,6 +66,11 @@ export default function LadderPage() {
 
   async function handleChangeName(newName: string) {
     const accessToken = await authState.getAccessToken();
+    if (!newName) {
+      await LadderController.deleteLadder(currentLadder.id, accessToken);
+      goToUser();
+      return;
+    }
     const newLadder = { ...currentLadder };
     newLadder.name = newName;
     await LadderController.editLadder(currentLadder.id, newName, accessToken);

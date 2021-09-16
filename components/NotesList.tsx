@@ -63,6 +63,10 @@ export default function NotesList(props: NotesListProps) {
 
   async function handleEdit(newRung: rung) {
     const accessToken = await authState.getAccessToken();
+    if (!newRung.content) {
+      await NoteController.deleteNote(newRung.id, props.ladderId, accessToken);
+      return;
+    }
     await NoteController.editNote(
       newRung.id,
       props.ladderId,
