@@ -35,17 +35,12 @@ export default function NotesList(props: NotesListProps) {
     props.addNewNote(order);
   }
 
-  function onRungClick(rung: rung) {}
+  function handleRungClick(rung: rung) {
+    props.setEditingNoteId(rung.id);
+  }
 
-  async function onRungMove(rung: rung) {
-    console.log("newOrder", rung.order);
-    const accessToken = await authState.getAccessToken();
-    await NoteController.reorderNote(
-      rung.id,
-      props.ladderId,
-      rung.order,
-      accessToken
-    );
+  function rungValidator(rung: rung) {
+    return rung.content.length < 30;
   }
 
   async function saveNewRung(newRung: rung) {
@@ -65,8 +60,24 @@ export default function NotesList(props: NotesListProps) {
     }
   }
 
-  function rungValidator(rung: rung) {
-    return rung.content.length < 30;
+  async function handleEdit(newRung: rung) {
+    const accessToken = await authState.getAccessToken();
+    await NoteController.editNote(
+      newRung.id,
+      props.ladderId,
+      newRung.content,
+      accessToken
+    );
+  }
+
+  async function handleRungMove(rung: rung) {
+    const accessToken = await authState.getAccessToken();
+    await NoteController.reorderNote(
+      rung.id,
+      props.ladderId,
+      rung.order,
+      accessToken
+    );
   }
 
   return (
@@ -75,11 +86,12 @@ export default function NotesList(props: NotesListProps) {
       updateRungs={updateRungs}
       addNewRung={addNewRung}
       saveNewRung={saveNewRung}
-      onRungClick={onRungClick}
+      onRungClick={handleRungClick}
       editingRungId={props.editingNoteId}
       setEditingRungId={props.setEditingNoteId}
       rungValidator={rungValidator}
-      onRungMove={onRungMove}
+      onRungMove={handleRungMove}
+      onEdit={handleEdit}
     />
   );
 }

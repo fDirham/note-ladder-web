@@ -15,6 +15,7 @@ type RungsListProps = {
   setEditingRungId: (newId: string) => void;
   rungValidator: (rung: rung) => boolean;
   onRungMove: (rung: rung) => Promise<void>;
+  onEdit: (newRung: rung) => Promise<void>;
 };
 
 export default function RungsList(props: RungsListProps) {
@@ -72,6 +73,8 @@ export default function RungsList(props: RungsListProps) {
     const rungIndex = newRungs.findIndex((e) => e.id === originalNewId);
     newRungs.splice(rungIndex, 1, newRung);
     props.updateRungs(newRungs);
+
+    if (!newRung.new) props.onEdit(newRung);
   }
 
   function handleDelete(rungId: string) {

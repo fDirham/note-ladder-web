@@ -51,4 +51,30 @@ export default class NoteController {
       return null;
     }
   }
+
+  static async editNote(
+    noteId: string,
+    ladderId: string,
+    newContent: string,
+    accessToken: string
+  ): Promise<note | null> {
+    try {
+      const config = {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      };
+
+      const editRes = await axios.put(
+        `${process.env.NEXT_PUBLIC_API_URL}/note/edit`,
+        { noteId, ladderId, newContent },
+        config
+      );
+
+      return editRes.data.note as note;
+    } catch (error) {
+      console.log(error.response);
+      return null;
+    }
+  }
 }
