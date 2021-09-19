@@ -20,6 +20,7 @@ type LaddersListProps = {
   addNewLadder?: (order: number) => void
   editingLadderId: string
   setEditingLadderId: (newId: string) => void
+  loading: boolean
 }
 
 export default function LaddersList(props: LaddersListProps) {
@@ -98,6 +99,7 @@ export default function LaddersList(props: LaddersListProps) {
       cursor={cursor}
       incrementCursor={incrementCursor}
       deleteRung={handleDelete}
+      loading={props.loading}
     />
   )
 }

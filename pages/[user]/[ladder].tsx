@@ -19,6 +19,7 @@ export default function LadderPage() {
   const [currentAuthorUser, setCurrentAuthorUser] = useState<user>()
   const [currentLadder, setCurrentLadder] = useState<ladder>()
   const [editingNoteId, setEditingNoteId] = useState<string>()
+  const [loading, setLoading] = useState<boolean>(true)
 
   useEffect(() => {
     getCurrentLadder()
@@ -46,6 +47,7 @@ export default function LadderPage() {
       currentLadder: retrievedLadder,
     })
     setCurrentLadder(retrievedLadder)
+    setLoading(false)
   }
 
   function handleNotFound() {
@@ -89,26 +91,31 @@ export default function LadderPage() {
     await LadderController.editLadder(currentLadder.id, newName, accessToken)
   }
 
-  if (!currentLadder) return <div>Loading...</div>
   return (
     <div className={styles.container}>
-      <p onClick={goToUser}>userId: {currentLadder.author}</p>
-      <EditableLadderTitle
-        onSubmit={handleChangeName}
-        title={currentLadder.name}
-      />
+      {loading && <div>Loading...</div>}
+      <p onClick={goToUser}>Author: {author}</p>
+      {currentLadder && (
+        <>
+          <EditableLadderTitle
+            onSubmit={handleChangeName}
+            title={currentLadder.name}
+          />
 
-      {(!currentLadder.notes || !currentLadder.notes.length) && (
-        <button onClick={() => addNewNote(0)}>Add note</button>
+          {(!currentLadder.notes || !currentLadder.notes.length) && (
+            <button onClick={() => addNewNote(0)}>Add note</button>
+          )}
+          <NotesList
+            notes={currentLadder.notes}
+            editingNoteId={editingNoteId}
+            setEditingNoteId={setEditingNoteId}
+            updateNotes={updateLadderNotes}
+            addNewNote={addNewNote}
+            ladderId={currentLadder.id}
+            loading={loading}
+          />
+        </>
       )}
-      <NotesList
-        notes={currentLadder.notes}
-        editingNoteId={editingNoteId}
-        setEditingNoteId={setEditingNoteId}
-        updateNotes={updateLadderNotes}
-        addNewNote={addNewNote}
-        ladderId={currentLadder.id}
-      />
     </div>
   )
 }

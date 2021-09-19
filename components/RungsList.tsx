@@ -21,6 +21,7 @@ type RungsListProps = {
   onEdit: (newRung: rung) => Promise<void>
   cursor: number
   incrementCursor: (incrementBy: number) => void
+  loading: boolean
 }
 
 export default function RungsList(props: RungsListProps) {
@@ -39,6 +40,7 @@ export default function RungsList(props: RungsListProps) {
     cursor,
     incrementCursor,
     !!props.editingRungId,
+    props.loading,
     props.rungs,
     {
       enterRung: props.onRungClick,

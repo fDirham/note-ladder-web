@@ -14,6 +14,7 @@ export default function useKeyboardControls(
   cursor: number,
   incrementCursor: (increment: number) => void,
   editingRung: boolean,
+  loading: boolean,
   rungs: rung[],
   keyboardFunctions: keyboardFunctions
 ) {
@@ -25,7 +26,7 @@ export default function useKeyboardControls(
   const shift = useKeyHold("Shift")
 
   const selectedRung = rungs[cursor]
-  const noEffect = editingRung || !selectedRung
+  const noEffect = editingRung || !selectedRung || loading
   function handleEscape() {
     if (!editingRung) return keyboardFunctions.goBack()
     keyboardFunctions.cancelEdit()
@@ -47,7 +48,7 @@ export default function useKeyboardControls(
   }
 
   function handleEnter() {
-    if (editingRung) return
+    if (editingRung || loading) return
     if (!selectedRung) keyboardFunctions.addNewRung(0)
     const increment = shift ? 0 : 1
     keyboardFunctions.addNewRung(cursor + increment)

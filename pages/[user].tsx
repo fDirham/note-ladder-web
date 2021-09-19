@@ -32,6 +32,7 @@ export default function UserPage() {
   const [currentUser, setCurrentUser] = useState<user>()
   const [editingLadderId, setEditingLadderId] = useState<string>() // Ladder id being edited
   const [networkError, setNetworkError] = useState<boolean>(false)
+  const [loading, setLoading] = useState<boolean>(true)
 
   useEffect(() => {
     getCurrentUser()
@@ -54,6 +55,7 @@ export default function UserPage() {
     if (!retrievedUser) return handleNotFound()
     cacheState.setState({ currentUser: retrievedUser })
     setCurrentUser(retrievedUser)
+    setLoading(false)
   }
 
   function handleNotFound() {
@@ -82,7 +84,6 @@ export default function UserPage() {
       new: true,
       author: authState.uid,
     }
-    console.log(newLadder)
     newLadders.splice(order, 0, newLadder)
     updateUserLadders(newLadders)
     setEditingLadderId(newLadder.id)
@@ -100,21 +101,31 @@ export default function UserPage() {
   }
 
   if (networkError) return <div>Network error LOL</div>
-  if (!currentUser) return <div>Loading...</div>
+
   return (
     <div className={styles.container}>
       <h1>{currentDisplayName}</h1>
-      {isUser() && <button onClick={logOut}>Logout</button>}
-      {isUser() && !currentUser.ladders.length && (
-        <button onClick={() => addNewLadder(0)}>New ladder</button>
+      {loading && <div>Loading...</div>}
+      {currentUser && (
+        <>
+          {isUser() && (
+            <>
+              <button onClick={logOut}>Logout</button>
+              {(!currentUser.ladders || !currentUser.ladders.length) && (
+                <button onClick={() => addNewLadder(0)}>New ladder</button>
+              )}
+            </>
+          )}
+          <LaddersList
+            ladders={currentUser.ladders || []}
+            updateLadders={updateUserLadders}
+            addNewLadder={addNewLadder}
+            editingLadderId={editingLadderId}
+            setEditingLadderId={setEditingLadderId}
+            loading={loading}
+          />
+        </>
       )}
-      <LaddersList
-        ladders={currentUser.ladders || []}
-        updateLadders={updateUserLadders}
-        addNewLadder={addNewLadder}
-        editingLadderId={editingLadderId}
-        setEditingLadderId={setEditingLadderId}
-      />
     </div>
   )
 }
