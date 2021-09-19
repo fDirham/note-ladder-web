@@ -1,13 +1,12 @@
 import create, { GetState, SetState } from "zustand"
 import { devtools, persist } from "zustand/middleware"
 import * as R from "ramda"
-import { ladder, note } from "types/rungs"
+import { ladder } from "types/rungs"
+import { user } from "types/users"
 
 export type cacheStateType = {
-  currentDisplayName?: string
-  ladders?: ladder[]
-  currentLadder?: string
-  notes?: note[]
+  currentUser?: user
+  currentLadder?: ladder
   setState: SetState<cacheStateType>
   getState: GetState<cacheStateType>
   resetState: () => void
@@ -29,10 +28,8 @@ const log: typeof devtools = (config) => (set, get, api) =>
 const createStore = R.pipe(log, devtools, create)
 
 export const initialStoreValues = {
-  currentDisplayName: "",
-  ladders: [],
-  currentLadder: "",
-  notes: [],
+  currentUser: undefined,
+  currentLadder: undefined,
 }
 
 export const useCacheState = createStore(
@@ -41,10 +38,8 @@ export const useCacheState = createStore(
       set: SetState<cacheStateType>,
       get: GetState<cacheStateType>
     ): cacheStateType => ({
-      currentDisplayName: initialStoreValues.currentDisplayName,
-      ladders: initialStoreValues.ladders,
+      currentUser: initialStoreValues.currentUser,
       currentLadder: initialStoreValues.currentLadder,
-      notes: initialStoreValues.notes,
       setState: set,
       getState: get,
       resetState: () => set(initialStoreValues),

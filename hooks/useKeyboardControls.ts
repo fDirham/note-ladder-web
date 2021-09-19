@@ -13,8 +13,8 @@ export type keyboardFunctions = {
 export default function useKeyboardControls(
   cursor: number,
   incrementCursor: (increment: number) => void,
+  editingRung: boolean,
   rungs: rung[],
-  disabled: boolean,
   keyboardFunctions: keyboardFunctions
 ) {
   useKeyTap("ArrowRight", handleRight)
@@ -25,8 +25,9 @@ export default function useKeyboardControls(
   const shift = useKeyHold("Shift")
 
   const selectedRung = rungs[cursor]
-  const noEffect = disabled || !selectedRung
+  const noEffect = editingRung || !selectedRung
   function handleEscape() {
+    if (!editingRung) return keyboardFunctions.goBack()
     keyboardFunctions.cancelEdit()
   }
 
@@ -41,12 +42,13 @@ export default function useKeyboardControls(
   }
 
   function handleLeft() {
-    if (disabled) return
+    if (editingRung) return
     keyboardFunctions.goBack()
   }
 
   function handleEnter() {
-    if (noEffect) return
+    if (editingRung) return
+    if (!selectedRung) keyboardFunctions.addNewRung(0)
     const increment = shift ? 0 : 1
     keyboardFunctions.addNewRung(cursor + increment)
   }

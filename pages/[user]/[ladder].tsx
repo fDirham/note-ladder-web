@@ -1,82 +1,95 @@
-import LadderController from "controllers/LadderController";
-import UserController from "controllers/UserController";
-import { useRouter } from "next/dist/client/router";
-import React, { useEffect, useState } from "react";
-import { ladder, note } from "types/rungs";
-import styles from "styles/Ladder.module.scss";
-import NotesList from "components/NotesList";
-import { user } from "types/users";
-import EditableLadderTitle from "components/EditableLadderTitle";
-import { authStateType, useAuthState } from "globalStates/useAuthStore";
+import LadderController from "controllers/LadderController"
+import UserController from "controllers/UserController"
+import { useRouter } from "next/dist/client/router"
+import React, { useEffect, useState } from "react"
+import { ladder, note } from "types/rungs"
+import styles from "styles/Ladder.module.scss"
+import NotesList from "components/NotesList"
+import { user } from "types/users"
+import EditableLadderTitle from "components/EditableLadderTitle"
+import { authStateType, useAuthState } from "globalStates/useAuthStore"
+import { cacheStateType, useCacheState } from "globalStates/useCacheStore"
 
 export default function LadderPage() {
-  const router = useRouter();
-  const { user: author, ladder } = router.query;
-  const authState: authStateType = useAuthState();
+  const router = useRouter()
+  const { user: author, ladder: ladderId } = router.query
+  const authState: authStateType = useAuthState()
+  const cacheState: cacheStateType = useCacheState()
 
-  const [currentAuthorUser, setCurrentAuthorUser] = useState<user>();
-  const [currentLadder, setCurrentLadder] = useState<ladder>();
-  const [editingNoteId, setEditingNoteId] = useState<string>();
+  const [currentAuthorUser, setCurrentAuthorUser] = useState<user>()
+  const [currentLadder, setCurrentLadder] = useState<ladder>()
+  const [editingNoteId, setEditingNoteId] = useState<string>()
 
   useEffect(() => {
-    getCurrentLadder();
-  }, [author, ladder]);
+    getCurrentLadder()
+  }, [author, ladderId])
 
   async function getCurrentLadder() {
-    if (!author || !ladder || currentLadder) return;
-    const retrievedUser = await UserController.getUser(author as string);
-    if (!retrievedUser) return handleNotFound();
-    setCurrentAuthorUser(retrievedUser);
+    if (!author || !ladderId || currentLadder) return
+
+    const { currentUser: cachedUser, currentLadder: cachedLadder } = cacheState
+    if (cachedUser && cachedUser.displayName === author)
+      setCurrentAuthorUser(cachedUser)
+    if (cachedLadder && cachedLadder.id === ladderId)
+      setCurrentLadder(cachedLadder)
+
+    const retrievedUser = await UserController.getUser(author as string)
+    if (!retrievedUser) return handleNotFound()
+    setCurrentAuthorUser(retrievedUser)
     const retrievedLadder = await LadderController.getLadder(
       retrievedUser.uid,
-      ladder as string
-    );
-    if (!retrievedLadder) return handleNotFound();
-    setCurrentLadder(retrievedLadder);
+      ladderId as string
+    )
+    if (!retrievedLadder) return handleNotFound()
+    cacheState.setState({
+      currentUser: retrievedUser,
+      currentLadder: retrievedLadder,
+    })
+    setCurrentLadder(retrievedLadder)
   }
 
   function handleNotFound() {
-    window.alert("Ladder not found");
-    router.back();
+    window.alert("Ladder not found")
+    router.back()
   }
 
   function addNewNote(order: number) {
-    const newNotes = [...currentLadder.notes];
+    const newNotes = [...currentLadder.notes]
     const newNote: note = {
       order,
       content: "",
       id: "new-note-" + Math.random(),
       new: true,
       author: currentLadder.author,
-    };
-    newNotes.splice(order, 0, newNote);
-    updateLadderNotes(newNotes);
-    setEditingNoteId(newNote.id);
+    }
+    newNotes.splice(order, 0, newNote)
+    updateLadderNotes(newNotes)
+    setEditingNoteId(newNote.id)
   }
 
   function updateLadderNotes(newNotes: note[]) {
-    const newLadder = { ...currentLadder };
-    newLadder.notes = newNotes;
-    setCurrentLadder(newLadder);
+    const newLadder = { ...currentLadder }
+    newLadder.notes = newNotes
+    setCurrentLadder(newLadder)
   }
 
   function goToUser() {
-    router.push(`/${currentAuthorUser.displayName}`);
+    router.push(`/${currentAuthorUser.displayName}`)
   }
 
   async function handleChangeName(newName: string) {
-    const accessToken = await authState.getAccessToken();
+    const accessToken = await authState.getAccessToken()
     if (!newName) {
-      await LadderController.deleteLadder(currentLadder.id, accessToken);
-      goToUser();
-      return;
+      await LadderController.deleteLadder(currentLadder.id, accessToken)
+      goToUser()
+      return
     }
-    const newLadder = { ...currentLadder };
-    newLadder.name = newName;
-    await LadderController.editLadder(currentLadder.id, newName, accessToken);
+    const newLadder = { ...currentLadder }
+    newLadder.name = newName
+    await LadderController.editLadder(currentLadder.id, newName, accessToken)
   }
 
-  if (!currentLadder) return <div>Loading...</div>;
+  if (!currentLadder) return <div>Loading...</div>
   return (
     <div className={styles.container}>
       <p onClick={goToUser}>userId: {currentLadder.author}</p>
@@ -97,5 +110,5 @@ export default function LadderPage() {
         ladderId={currentLadder.id}
       />
     </div>
-  );
+  )
 }

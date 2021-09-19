@@ -28,6 +28,8 @@ type RungsListProps = {
 export default function RungsList(props: RungsListProps) {
   const [movingRungId, setMovingRungId] = useState<string>() // Id of moving rung
   const [droppedSpacer, setDroppedSpacer] = useState<number>() // prevOrder
+  const [incrementedCursorAdd, setIncrementedCursorAdd] =
+    useState<boolean>(false)
   const router = useRouter()
 
   useEffect(() => {
@@ -41,8 +43,8 @@ export default function RungsList(props: RungsListProps) {
   useKeyboardControls(
     cursor,
     incrementCursor,
-    props.rungs,
     !!props.editingRungId,
+    props.rungs,
     {
       enterRung: props.onRungClick,
       editRung: setEditRung,
@@ -103,18 +105,25 @@ export default function RungsList(props: RungsListProps) {
     props.updateRungs(newRungs)
 
     if (!newRung.new) props.onEdit(newRung)
+    if (incrementedCursorAdd) setIncrementedCursorAdd(false)
   }
 
   function handleDelete(rungId: string) {
     const newRungs = [...props.rungs]
     const rungIndex = newRungs.findIndex((e) => e.id === rungId)
-    if (rungIndex <= cursor) incrementCursor(-1)
+    if (incrementedCursorAdd) {
+      incrementCursor(-1)
+      setIncrementedCursorAdd(false)
+    }
     newRungs.splice(rungIndex, 1)
     props.updateRungs(newRungs)
   }
 
   function addNewRung(order: number) {
-    if (order <= cursor) incrementCursor(1)
+    if (order > cursor) {
+      incrementCursor(1)
+      setIncrementedCursorAdd(true)
+    }
     props.addNewRung(order)
   }
 
@@ -131,7 +140,7 @@ export default function RungsList(props: RungsListProps) {
   }
 
   function goBack() {
-    router.back()
+    router.push("/" + router.query.user)
   }
 
   return (

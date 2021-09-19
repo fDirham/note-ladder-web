@@ -7,11 +7,14 @@ import { user } from "types/users"
 import styles from "styles/User.module.scss"
 import { ladder } from "types/rungs"
 import LaddersList from "components/LaddersList"
+import { cacheStateType, useCacheState } from "globalStates/useCacheStore"
 
 export default function UserPage() {
   const router = useRouter()
-  const authState: authStateType = useAuthState()
   const { user: currentDisplayName } = router.query
+  const authState: authStateType = useAuthState()
+  const cacheState: cacheStateType = useCacheState()
+
   const dummyLadders: ladder[] = [
     { name: "ladder1", order: 0, id: "test0", author: authState.uid },
     { name: "sometext", order: 1, id: "test1", author: authState.uid },
@@ -34,10 +37,17 @@ export default function UserPage() {
 
   async function getCurrentUser() {
     if (!currentDisplayName || currentUser) return
+
+    const { currentUser: cachedUser } = cacheState
+    if (cachedUser && cachedUser.displayName === currentDisplayName)
+      setCurrentUser(cachedUser)
+
     const retrievedUser = await UserController.getUser(
       currentDisplayName as string
     )
+
     if (!retrievedUser) return handleNotFound()
+    cacheState.setState({ currentUser: retrievedUser })
     setCurrentUser(retrievedUser)
   }
 
@@ -67,6 +77,7 @@ export default function UserPage() {
       new: true,
       author: authState.uid,
     }
+    console.log(newLadder)
     newLadders.splice(order, 0, newLadder)
     updateUserLadders(newLadders)
     setEditingLadderId(newLadder.id)

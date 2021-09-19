@@ -1,8 +1,10 @@
+import useKeyTap from "hooks/useKeyTap"
 import React, {
   ChangeEvent,
   ChangeEventHandler,
   FormEvent,
   useEffect,
+  useRef,
   useState,
 } from "react"
 import { useDrag } from "react-dnd"
@@ -24,6 +26,7 @@ type RungBlockProps = {
 
 export default function RungBlock(props: RungBlockProps) {
   const [stateContent, setStateContent] = useState<string>(props.rung.content)
+  const inputRef = useRef(null)
   const [{ isDragging }, drag] = useDrag(() => ({
     type: itemTypes.LADDER,
     collect: (monitor) => ({
@@ -33,6 +36,7 @@ export default function RungBlock(props: RungBlockProps) {
 
   useEffect(() => {
     if (!props.editing && !stateContent) props.onDelete(props.rung.id)
+    if (props.editing) inputRef.current.focus()
   }, [props.editing])
 
   useEffect(() => {
@@ -73,18 +77,15 @@ export default function RungBlock(props: RungBlockProps) {
       onBlur={handleSubmit}
       onClick={() => props.onClick(props.rung)}
     >
-      {!props.editing ? (
-        stateContent
-      ) : (
-        <form onSubmit={handleSubmit}>
-          <input
-            autoFocus
-            type="text"
-            value={stateContent}
-            onChange={handleChange}
-          />
-        </form>
-      )}
+      <form onSubmit={handleSubmit}>
+        <input
+          ref={inputRef}
+          type="text"
+          value={stateContent}
+          onChange={handleChange}
+          disabled={!props.editing}
+        />
+      </form>
     </div>
   )
 }
