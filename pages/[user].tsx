@@ -8,12 +8,14 @@ import styles from "styles/User.module.scss"
 import { ladder } from "types/rungs"
 import LaddersList from "components/LaddersList"
 import { cacheStateType, useCacheState } from "globalStates/useCacheStore"
+import { cursorStateType, useCursorState } from "globalStates/useCursorStore"
 
 export default function UserPage() {
   const router = useRouter()
   const { user: currentDisplayName } = router.query
   const authState: authStateType = useAuthState()
   const cacheState: cacheStateType = useCacheState()
+  const cursorState: cursorStateType = useCursorState()
 
   const dummyLadders: ladder[] = [
     { name: "ladder1", order: 0, id: "test0", author: authState.uid },
@@ -41,6 +43,9 @@ export default function UserPage() {
     const { currentUser: cachedUser } = cacheState
     if (cachedUser && cachedUser.displayName === currentDisplayName)
       setCurrentUser(cachedUser)
+    else {
+      cursorState.setState({ ladderCursor: 0 })
+    }
 
     const retrievedUser = await UserController.getUser(
       currentDisplayName as string

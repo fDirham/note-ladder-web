@@ -44,6 +44,23 @@ export default function RungBlock(props: RungBlockProps) {
     props.setMovingRungId(toSet)
   }, [isDragging])
 
+  useEffect(() => {
+    if (props.selected) scrollToBlock()
+  }, [props.selected])
+
+  function scrollToBlock() {
+    const windowHeight = window.innerHeight
+    const boundingClientRectTop = inputRef.current.getBoundingClientRect().top
+    const yOffset = 40
+    const needScroll =
+      boundingClientRectTop > windowHeight - yOffset ||
+      boundingClientRectTop < yOffset
+    if (!needScroll) return
+
+    const y = boundingClientRectTop + window.pageYOffset - yOffset
+    window.scrollTo({ top: y, behavior: "smooth" })
+  }
+
   async function handleSubmit(e: FormEvent) {
     if (e) e.preventDefault()
     if (!stateContent) return props.onDelete(props.rung.id)

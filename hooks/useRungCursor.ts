@@ -1,42 +1,73 @@
+import { cursorStateType, useCursorState } from "globalStates/useCursorStore"
 import { useEffect, useRef, useState } from "react"
 import useKeyHold from "./useKeyHold"
 
 const timeoutMs = 750
 const intervalMs = 80
-export default function useRungCursor(maxLength: number, disabled: boolean) {
-  const [cursor, _setCursor] = useState<number>(0) // order being selected
-  const cursorRef = useRef(cursor)
-  function setCursor(newCursor: number) {
-    cursorRef.current = newCursor
-    _setCursor(newCursor)
+export type cursorTypes = "ladder" | "note"
+export default function useRungCursor(
+  type: cursorTypes,
+  maxLength: number,
+  disabled: boolean
+) {
+  const cursorState: cursorStateType = useCursorState()
+  const {
+    noteCursor,
+    incrementNoteCursor,
+    ladderCursor,
+    incrementLadderCursor,
+    setState,
+  } = cursorState
+
+  let cursor: number
+  let incrementCursor: (incrementBy: number) => void
+
+  switch (type) {
+    case "ladder":
+      cursor = ladderCursor
+      incrementCursor = incrementLadderCursor
+      break
+    case "note":
+      cursor = noteCursor
+      incrementCursor = incrementNoteCursor
+      break
   }
+
   const cursorMoveTimeoutRef = useRef<ReturnType<typeof setTimeout>>()
   const cursorMoveIntervalRef = useRef<ReturnType<typeof setInterval>>()
 
   const upPress = useKeyHold("ArrowUp")
   const downPress = useKeyHold("ArrowDown")
 
+  function wrappedIncrementCursor(incrementBy: number) {
+    let newCursor = cursor + incrementBy
+    if (newCursor < 0) newCursor = maxLength - 1
+    if (newCursor >= maxLength) newCursor = 0
+    const toIncrement = newCursor - cursor
+    incrementCursor(toIncrement)
+  }
+
   useEffect(() => {
     if (disabled || !maxLength) return
     let cursorPress = upPress || downPress
     if (upPress) {
-      incrementCursor(-1)
+      wrappedIncrementCursor(-1)
       if (!cursorMoveTimeoutRef.current)
         cursorMoveTimeoutRef.current = setTimeout(() => {
           if (!cursorMoveIntervalRef.current)
             cursorMoveIntervalRef.current = setInterval(() => {
-              incrementCursor(-1)
+              wrappedIncrementCursor(-1)
             }, intervalMs)
         }, timeoutMs)
     }
 
     if (downPress) {
-      incrementCursor(1)
+      wrappedIncrementCursor(1)
       if (!cursorMoveTimeoutRef.current)
         cursorMoveTimeoutRef.current = setTimeout(() => {
           if (!cursorMoveIntervalRef.current)
             cursorMoveIntervalRef.current = setInterval(() => {
-              incrementCursor(1)
+              wrappedIncrementCursor(1)
             }, intervalMs)
         }, timeoutMs)
     }
@@ -52,13 +83,6 @@ export default function useRungCursor(maxLength: number, disabled: boolean) {
       }
     }
   }, [upPress, downPress])
-
-  function incrementCursor(increment: number) {
-    let newCursor = cursorRef.current + increment
-    if (newCursor < 0) newCursor = 0
-    if (newCursor >= maxLength) newCursor = maxLength - 1
-    setCursor(newCursor)
-  }
 
   return { cursor, incrementCursor }
 }

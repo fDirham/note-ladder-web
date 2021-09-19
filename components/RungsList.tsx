@@ -1,11 +1,6 @@
-import useKeyboardControls, {
-  keyboardFunctions,
-} from "hooks/useKeyboardControls"
-import useKeyHold from "hooks/useKeyHold"
-import useKeyTap from "hooks/useKeyTap"
-import useRungCursor from "hooks/useRungCursor"
+import useKeyboardControls from "hooks/useKeyboardControls"
 import { useRouter } from "next/dist/client/router"
-import React, { useEffect, useRef, useState } from "react"
+import React, { useEffect, useState } from "react"
 import { rung } from "types/rungs"
 import { tempRungName } from "utilities/constants"
 import RungBlock from "./RungBlock"
@@ -15,6 +10,7 @@ import RungSpacer from "./RungSpacer"
 type RungsListProps = {
   rungs: rung[]
   updateRungs: (newRungs: rung[]) => void
+  deleteRung: (rungId: string) => Promise<boolean>
   addNewRung: (order: number) => void
   saveNewRung: (newRung: rung) => Promise<rung | null>
   onRungClick: (rung: rung) => void
@@ -23,6 +19,8 @@ type RungsListProps = {
   rungValidator: (rung: rung) => boolean
   onRungMove: (rung: rung) => Promise<void>
   onEdit: (newRung: rung) => Promise<void>
+  cursor: number
+  incrementCursor: (incrementBy: number) => void
 }
 
 export default function RungsList(props: RungsListProps) {
@@ -36,10 +34,7 @@ export default function RungsList(props: RungsListProps) {
     if (movingRungId && typeof droppedSpacer === "number") handleMove()
   }, [droppedSpacer, movingRungId])
 
-  const { cursor, incrementCursor } = useRungCursor(
-    props.rungs.length,
-    !!props.editingRungId
-  )
+  const { cursor, incrementCursor } = props
   useKeyboardControls(
     cursor,
     incrementCursor,
@@ -111,20 +106,27 @@ export default function RungsList(props: RungsListProps) {
   function handleDelete(rungId: string) {
     const newRungs = [...props.rungs]
     const rungIndex = newRungs.findIndex((e) => e.id === rungId)
+    const rungToDelete = newRungs[rungIndex]
+
+    if (!rungToDelete.new) props.deleteRung(rungId)
+    if (!!props.editingRungId) props.setEditingRungId(undefined)
+
+    newRungs.splice(rungIndex, 1)
+    props.updateRungs(newRungs)
+
     if (incrementedCursorAdd) {
       incrementCursor(-1)
       setIncrementedCursorAdd(false)
     }
-    newRungs.splice(rungIndex, 1)
-    props.updateRungs(newRungs)
   }
 
   function addNewRung(order: number) {
+    props.addNewRung(order)
+
     if (order > cursor) {
       incrementCursor(1)
       setIncrementedCursorAdd(true)
     }
-    props.addNewRung(order)
   }
 
   function onRungClick(rung: rung) {

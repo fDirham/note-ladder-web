@@ -12,6 +12,7 @@ import RungsList from "./RungsList"
 import { authStateType, useAuthState } from "globalStates/useAuthStore"
 import { useRouter } from "next/dist/client/router"
 import { maxLadderNameLength } from "utilities/constants"
+import useRungCursor from "hooks/useRungCursor"
 
 type LaddersListProps = {
   ladders: ladder[]
@@ -25,6 +26,11 @@ export default function LaddersList(props: LaddersListProps) {
   const router = useRouter()
   const authState: authStateType = useAuthState()
   useEffect(() => {}, [props.ladders])
+  const { cursor, incrementCursor } = useRungCursor(
+    "ladder",
+    props.ladders.length,
+    !!props.editingLadderId
+  )
 
   function updateRungs(newRungs: rung[]) {
     props.updateLadders(rungsToLadders(newRungs))
@@ -61,15 +67,15 @@ export default function LaddersList(props: LaddersListProps) {
   async function handleEdit(newRung: rung) {
     const accessToken = await authState.getAccessToken()
     if (!newRung.content) {
-      await handleDelete(newRung)
+      await handleDelete(newRung.id)
       return
     }
     await LadderController.editLadder(newRung.id, newRung.content, accessToken)
   }
 
-  async function handleDelete(rung: rung) {
+  async function handleDelete(rungId: string) {
     const accessToken = await authState.getAccessToken()
-    await LadderController.deleteLadder(rung.id, accessToken)
+    return await LadderController.deleteLadder(rungId, accessToken)
   }
 
   async function handleRungMove(rung: rung) {
@@ -89,6 +95,9 @@ export default function LaddersList(props: LaddersListProps) {
       rungValidator={rungValidator}
       onRungMove={handleRungMove}
       onEdit={handleEdit}
+      cursor={cursor}
+      incrementCursor={incrementCursor}
+      deleteRung={handleDelete}
     />
   )
 }

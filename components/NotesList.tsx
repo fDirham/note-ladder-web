@@ -5,6 +5,7 @@ import RungsList from "./RungsList"
 import { authStateType, useAuthState } from "globalStates/useAuthStore"
 import NoteController from "controllers/NoteController"
 import { maxNoteContentLength } from "utilities/constants"
+import useRungCursor from "hooks/useRungCursor"
 
 type NotesListProps = {
   notes: note[]
@@ -18,6 +19,11 @@ type NotesListProps = {
 export default function NotesList(props: NotesListProps) {
   const authState: authStateType = useAuthState()
   useEffect(() => {}, [props.notes])
+  const { cursor, incrementCursor } = useRungCursor(
+    "note",
+    props.notes.length,
+    !!props.editingNoteId
+  )
 
   function updateRungs(newRungs: rung[]) {
     props.updateNotes(rungsToNotes(newRungs))
@@ -55,7 +61,7 @@ export default function NotesList(props: NotesListProps) {
   async function handleEdit(newRung: rung) {
     const accessToken = await authState.getAccessToken()
     if (!newRung.content) {
-      await handleDelete(newRung)
+      await handleDelete(newRung.id)
       return
     }
     await NoteController.editNote(
@@ -66,9 +72,9 @@ export default function NotesList(props: NotesListProps) {
     )
   }
 
-  async function handleDelete(rung: rung) {
+  async function handleDelete(rungId: string) {
     const accessToken = await authState.getAccessToken()
-    await NoteController.deleteNote(rung.id, props.ladderId, accessToken)
+    return await NoteController.deleteNote(rungId, props.ladderId, accessToken)
   }
 
   async function handleRungMove(rung: rung) {
@@ -93,6 +99,9 @@ export default function NotesList(props: NotesListProps) {
       rungValidator={rungValidator}
       onRungMove={handleRungMove}
       onEdit={handleEdit}
+      cursor={cursor}
+      incrementCursor={incrementCursor}
+      deleteRung={handleDelete}
     />
   )
 }
