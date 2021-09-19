@@ -1,15 +1,15 @@
 import create, { GetState, SetState } from "zustand"
 import { devtools, persist } from "zustand/middleware"
 import * as R from "ramda"
-import { getAccessToken } from "./actions/authActions"
+import { ladder, note } from "types/rungs"
 
-export type authStateType = {
-  displayName?: string
-  uid?: string
-  accessToken?: string
-  getAccessToken: () => Promise<string>
-  setState: SetState<authStateType>
-  getState: GetState<authStateType>
+export type cacheStateType = {
+  currentDisplayName?: string
+  ladders?: ladder[]
+  currentLadder?: string
+  notes?: note[]
+  setState: SetState<cacheStateType>
+  getState: GetState<cacheStateType>
   resetState: () => void
 }
 
@@ -29,27 +29,28 @@ const log: typeof devtools = (config) => (set, get, api) =>
 const createStore = R.pipe(log, devtools, create)
 
 export const initialStoreValues = {
-  displayName: "",
-  uid: "",
-  accessToken: "",
+  currentDisplayName: "",
+  ladders: [],
+  currentLadder: "",
+  notes: [],
 }
 
-export const useAuthState = createStore(
+export const useCacheState = createStore(
   persist(
     (
-      set: SetState<authStateType>,
-      get: GetState<authStateType>
-    ): authStateType => ({
-      displayName: initialStoreValues.displayName,
-      uid: initialStoreValues.uid,
-      accessToken: initialStoreValues.accessToken,
-      getAccessToken: getAccessToken,
+      set: SetState<cacheStateType>,
+      get: GetState<cacheStateType>
+    ): cacheStateType => ({
+      currentDisplayName: initialStoreValues.currentDisplayName,
+      ladders: initialStoreValues.ladders,
+      currentLadder: initialStoreValues.currentLadder,
+      notes: initialStoreValues.notes,
       setState: set,
       getState: get,
       resetState: () => set(initialStoreValues),
     }),
     {
-      name: "auth",
+      name: "cache",
     }
   )
 )

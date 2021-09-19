@@ -1,22 +1,22 @@
-import SignIn from "components/SignIn";
-import SignUp from "components/SignUp";
-import { authStateType, useAuthState } from "globalStates/useAuthStore";
-import { useRouter } from "next/dist/client/router";
-import Head from "next/head";
-import Image from "next/image";
-import { useEffect, useState } from "react";
-import AuthController from "../controllers/AuthController";
-import styles from "../styles/Home.module.scss";
+import SignIn from "components/SignIn"
+import SignUp from "components/SignUp"
+import { authStateType, useAuthState } from "globalStates/useAuthStore"
+import { useRouter } from "next/dist/client/router"
+import Head from "next/head"
+import Image from "next/image"
+import { useEffect, useState } from "react"
+import AuthController from "../controllers/AuthController"
+import styles from "../styles/Home.module.scss"
 
 export default function Home() {
-  const [signUp, setSignUp] = useState<boolean>(false);
-  const authState: authStateType = useAuthState();
-  const router = useRouter();
+  const [signUp, setSignUp] = useState<boolean>(false)
+  const authState: authStateType = useAuthState()
+  const router = useRouter()
 
   useEffect(() => {
     // Check localStorage, log user in
-    if (authState.uid) router.push(`/${authState.displayName}`);
-  }, [authState.uid]);
+    if (authState.uid) router.push(`/${authState.displayName}`)
+  }, [authState.uid])
 
   return (
     <div className={styles.container}>
@@ -51,5 +51,5 @@ export default function Home() {
         </a>
       </footer>
     </div>
-  );
+  )
 }

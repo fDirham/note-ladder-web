@@ -7,3 +7,11 @@
 .containerIsDragging {
   opacity: 0.3;
 }
+
+.containerNew {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.containerSelected {
+  border-width: 2px;
+}
