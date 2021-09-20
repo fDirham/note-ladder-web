@@ -1,5 +1,19 @@
+@import "styles/util/base";
+
 .container {
-  height: 1rem;
+  height: $blockPadding;
   width: 100%;
+  background-color: $gray;
+  margin: 0.3rem 0;
+  border-radius: 180px;
+}
+
+.container:hover {
+  cursor: pointer;
+  background-color: red;
+  opacity: 0.5;
+}
+
+.hoverContainer {
   background-color: red;
 }

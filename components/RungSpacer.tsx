@@ -1,16 +1,16 @@
-import AuthController from "controllers/AuthController";
-import { authStateType, useAuthState } from "globalStates/useAuthStore";
-import { useRouter } from "next/dist/client/router";
-import React, { FormEvent, useEffect, useState } from "react";
-import { useDrop } from "react-dnd";
-import { itemTypes } from "types/dnd";
-import styles from "./RungSpacer.module.scss";
+import AuthController from "controllers/AuthController"
+import { authStateType, useAuthState } from "globalStates/useAuthStore"
+import { useRouter } from "next/dist/client/router"
+import React, { FormEvent, useEffect, useState } from "react"
+import { useDrop } from "react-dnd"
+import { itemTypes } from "types/dnd"
+import styles from "./RungSpacer.module.scss"
 
 type RungSpacerProps = {
-  prevRung: number;
-  setDroppedSpacer: (prevNumber: number) => void;
-  addNewRung: (order: number) => void;
-};
+  prevRung: number
+  setDroppedSpacer: (prevNumber: number) => void
+  addNewRung: (order: number) => void
+}
 
 export default function RungSpacer(props: RungSpacerProps) {
   const [{ isOver }, drop] = useDrop(
@@ -22,18 +22,17 @@ export default function RungSpacer(props: RungSpacerProps) {
       }),
     }),
     []
-  );
+  )
 
   function handleDrop() {
-    props.setDroppedSpacer(props.prevRung);
+    props.setDroppedSpacer(props.prevRung)
   }
 
   return (
     <div
       ref={drop}
-      className={styles.container}
-      style={{ backgroundColor: isOver ? "red" : "blue" }}
+      className={`${styles.container} ${isOver ? styles.hoverContainer : ""}`}
       onClick={() => props.addNewRung(props.prevRung + 1)}
     ></div>
-  );
+  )
 }

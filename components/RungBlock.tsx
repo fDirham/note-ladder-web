@@ -55,6 +55,7 @@ export default function RungBlock(props: RungBlockProps) {
     const needScroll =
       boundingClientRectTop > windowHeight - yOffset ||
       boundingClientRectTop < yOffset
+
     if (!needScroll) return
 
     const y = boundingClientRectTop + window.pageYOffset - yOffset

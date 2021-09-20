@@ -133,7 +133,6 @@ export default function RungsList(props: RungsListProps) {
     setAddCursorMovement({ origin: cursor, newOrder: order })
     const toIncrement = order - cursor
     incrementCursor(toIncrement)
-    console.log(toIncrement, order, cursor)
     props.addNewRung(order)
   }
 
@@ -160,7 +159,7 @@ export default function RungsList(props: RungsListProps) {
     <div className={styles.container}>
       {props.rungs.map((rung, index) => {
         return (
-          <div key={`rung-${index}`}>
+          <div key={`rung-${index}`} className={styles.containerRung}>
             {index === 0 && (
               <RungSpacer
                 key={"spacer-genesis-" + index}

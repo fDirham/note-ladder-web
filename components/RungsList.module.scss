@@ -1,3 +1,8 @@
+@import "styles/util/base";
 .container {
-  padding: 1rem;
+  width: 100%;
+  padding: 0 $blockPadding;
+  background-color: $gray;
+  border-radius: 10px;
+  margin-top: 2rem;
 }

@@ -9,6 +9,7 @@ import { user } from "types/users"
 import EditableLadderTitle from "components/EditableLadderTitle"
 import { authStateType, useAuthState } from "globalStates/useAuthStore"
 import { cacheStateType, useCacheState } from "globalStates/useCacheStore"
+import PageWrapper from "components/PageWrapper"
 
 export default function LadderPage() {
   const router = useRouter()
@@ -106,15 +107,15 @@ export default function LadderPage() {
   }
 
   return (
-    <div className={styles.container}>
+    <PageWrapper>
       {loading && <div>Loading...</div>}
-      <p onClick={goToUser}>Author: {author}</p>
       {currentLadder && (
         <>
           <EditableLadderTitle
             onSubmit={handleChangeName}
             title={currentLadder.name}
           />
+          <p onClick={goToUser}>{author}</p>
 
           {(!currentLadder.notes || !currentLadder.notes.length) && (
             <button onClick={() => addNewNote(0)}>Add note</button>
@@ -130,6 +131,6 @@ export default function LadderPage() {
           />
         </>
       )}
-    </div>
+    </PageWrapper>
   )
 }

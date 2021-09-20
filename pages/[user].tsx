@@ -9,6 +9,7 @@ import { ladder } from "types/rungs"
 import LaddersList from "components/LaddersList"
 import { cacheStateType, useCacheState } from "globalStates/useCacheStore"
 import { cursorStateType, useCursorState } from "globalStates/useCursorStore"
+import PageWrapper from "components/PageWrapper"
 
 export default function UserPage() {
   const router = useRouter()
@@ -112,7 +113,7 @@ export default function UserPage() {
   if (networkError) return <div>Network error LOL</div>
 
   return (
-    <div className={styles.container}>
+    <PageWrapper>
       <h1>{currentDisplayName}</h1>
       {loading && <div>Loading...</div>}
       {currentUser && (
@@ -135,6 +136,6 @@ export default function UserPage() {
           />
         </>
       )}
-    </div>
+    </PageWrapper>
   )
 }
