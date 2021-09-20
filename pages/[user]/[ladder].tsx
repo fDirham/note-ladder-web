@@ -1,7 +1,7 @@
 import LadderController from "controllers/LadderController"
 import UserController from "controllers/UserController"
 import { useRouter } from "next/dist/client/router"
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import { ladder, note } from "types/rungs"
 import styles from "styles/Ladder.module.scss"
 import NotesList from "components/NotesList"
@@ -21,6 +21,14 @@ export default function LadderPage() {
   const [editingNoteId, setEditingNoteId] = useState<string>()
   const [loading, setLoading] = useState<boolean>(true)
 
+  const _notMounted = useRef(false)
+
+  useEffect(() => {
+    return () => {
+      _notMounted.current = true
+    }
+  }, [])
+
   useEffect(() => {
     getCurrentLadder()
   }, [author, ladderId])
@@ -36,16 +44,22 @@ export default function LadderPage() {
 
     const retrievedUser = await UserController.getUser(author as string)
     if (!retrievedUser) return handleNotFound()
+    cacheState.setState({
+      currentUser: retrievedUser,
+    })
+    if (_notMounted.current) return
     setCurrentAuthorUser(retrievedUser)
+
     const retrievedLadder = await LadderController.getLadder(
       retrievedUser.uid,
       ladderId as string
     )
     if (!retrievedLadder) return handleNotFound()
     cacheState.setState({
-      currentUser: retrievedUser,
       currentLadder: retrievedLadder,
     })
+    if (_notMounted.current) return
+
     setCurrentLadder(retrievedLadder)
     setLoading(false)
   }

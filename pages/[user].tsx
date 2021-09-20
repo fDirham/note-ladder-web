@@ -2,7 +2,7 @@ import AuthController from "controllers/AuthController"
 import UserController from "controllers/UserController"
 import { authStateType, useAuthState } from "globalStates/useAuthStore"
 import { useRouter } from "next/dist/client/router"
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import { user } from "types/users"
 import styles from "styles/User.module.scss"
 import { ladder } from "types/rungs"
@@ -33,6 +33,13 @@ export default function UserPage() {
   const [editingLadderId, setEditingLadderId] = useState<string>() // Ladder id being edited
   const [networkError, setNetworkError] = useState<boolean>(false)
   const [loading, setLoading] = useState<boolean>(true)
+  const _notMounted = useRef(false)
+
+  useEffect(() => {
+    return () => {
+      _notMounted.current = true
+    }
+  }, [])
 
   useEffect(() => {
     getCurrentUser()
@@ -51,6 +58,8 @@ export default function UserPage() {
     const retrievedUser = await UserController.getUser(
       currentDisplayName as string
     )
+
+    if (_notMounted.current) return
 
     if (!retrievedUser) return handleNotFound()
     cacheState.setState({ currentUser: retrievedUser })
