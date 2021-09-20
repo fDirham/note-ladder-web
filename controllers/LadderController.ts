@@ -1,5 +1,5 @@
-import axios from "axios";
-import { ladder } from "types/rungs";
+import axios from "axios"
+import { ladder } from "types/rungs"
 
 export default class LadderController {
   static async createLadder(
@@ -12,16 +12,16 @@ export default class LadderController {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
-      };
+      }
       const createRes = await axios.post(
         `${process.env.NEXT_PUBLIC_API_URL}/ladder`,
         { name, order },
         config
-      );
-      return createRes.data.ladder as ladder;
+      )
+      return createRes.data.ladder as ladder
     } catch (error) {
-      console.log(error);
-      return null;
+      console.log(error)
+      return null
     }
   }
 
@@ -32,11 +32,11 @@ export default class LadderController {
     try {
       const getRes = await axios.get(
         `${process.env.NEXT_PUBLIC_API_URL}/ladder/${authorId}/${ladderId}`
-      );
-      return getRes.data.ladder as ladder;
+      )
+      return getRes.data.ladder as ladder
     } catch (error) {
-      console.log(error.response);
-      return null;
+      console.log(error.response)
+      return null
     }
   }
 
@@ -50,18 +50,18 @@ export default class LadderController {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
-      };
+      }
 
       const reorderRes = await axios.put(
         `${process.env.NEXT_PUBLIC_API_URL}/ladder/reorder`,
         { ladderId, newOrder },
         config
-      );
+      )
 
-      return reorderRes.data.ladder as ladder;
+      return reorderRes.data.ladder as ladder
     } catch (error) {
-      console.log(error.response);
-      return null;
+      console.log(error.response)
+      return null
     }
   }
 
@@ -75,18 +75,18 @@ export default class LadderController {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
-      };
+      }
 
       const reorderRes = await axios.put(
         `${process.env.NEXT_PUBLIC_API_URL}/ladder/edit`,
         { ladderId, newName },
         config
-      );
+      )
 
-      return reorderRes.data.ladder as ladder;
+      return reorderRes.data.ladder as ladder
     } catch (error) {
-      console.log(error.response);
-      return null;
+      console.log(error.response)
+      return null
     }
   }
 
@@ -99,17 +99,17 @@ export default class LadderController {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
-      };
+      }
 
       const reorderRes = await axios.delete(
         `${process.env.NEXT_PUBLIC_API_URL}/ladder/${ladderId}`,
         config
-      );
+      )
 
-      return true;
+      return true
     } catch (error) {
-      console.log(error.response);
-      return false;
+      console.log(error.response)
+      return false
     }
   }
 }

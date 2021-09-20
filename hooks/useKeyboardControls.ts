@@ -9,7 +9,9 @@ export type keyboardFunctions = {
   cancelEdit: () => void
   goBack: () => void
   addNewRung: (order: number) => void
+  deleteRung: (rungId: string) => void
 }
+
 export default function useKeyboardControls(
   cursor: number,
   incrementCursor: (increment: number) => void,
@@ -21,6 +23,7 @@ export default function useKeyboardControls(
   useKeyTap("ArrowRight", handleRight)
   useKeyTap("ArrowLeft", handleLeft)
   useKeyTap("e", handleE)
+  useKeyTap("d", handleD)
   useKeyTap("Escape", handleEscape)
   useKeyTap("Enter", handleEnter)
   const shift = useKeyHold("Shift")
@@ -30,11 +33,6 @@ export default function useKeyboardControls(
   function handleEscape() {
     if (!editingRung) return keyboardFunctions.goBack()
     keyboardFunctions.cancelEdit()
-  }
-
-  function handleE() {
-    if (noEffect) return
-    keyboardFunctions.editRung(selectedRung)
   }
 
   function handleRight() {
@@ -49,9 +47,19 @@ export default function useKeyboardControls(
 
   function handleEnter() {
     if (editingRung || loading) return
-    if (!selectedRung) keyboardFunctions.addNewRung(0)
+    if (!selectedRung) return keyboardFunctions.addNewRung(0)
     const increment = shift ? 0 : 1
     keyboardFunctions.addNewRung(cursor + increment)
+  }
+
+  function handleD() {
+    if (noEffect) return
+    keyboardFunctions.deleteRung(selectedRung.id)
+  }
+
+  function handleE() {
+    if (noEffect) return
+    keyboardFunctions.editRung(selectedRung)
   }
 
   return null

@@ -27,8 +27,8 @@ type RungsListProps = {
 export default function RungsList(props: RungsListProps) {
   const [movingRungId, setMovingRungId] = useState<string>() // Id of moving rung
   const [droppedSpacer, setDroppedSpacer] = useState<number>() // prevOrder
-  const [incrementedCursorAdd, setIncrementedCursorAdd] =
-    useState<boolean>(false)
+  const [addCursorMovement, setAddCursorMovement] =
+    useState<{ origin: number; newOrder: number }>()
   const router = useRouter()
 
   useEffect(() => {
@@ -48,6 +48,7 @@ export default function RungsList(props: RungsListProps) {
       cancelEdit: cancelEdit,
       goBack: goBack,
       addNewRung: addNewRung,
+      deleteRung: handleDelete,
     }
   )
 
@@ -102,7 +103,7 @@ export default function RungsList(props: RungsListProps) {
     props.updateRungs(newRungs)
 
     if (!newRung.new) props.onEdit(newRung)
-    if (incrementedCursorAdd) setIncrementedCursorAdd(false)
+    if (addCursorMovement) setAddCursorMovement(undefined)
   }
 
   function handleDelete(rungId: string) {
@@ -116,19 +117,24 @@ export default function RungsList(props: RungsListProps) {
     newRungs.splice(rungIndex, 1)
     props.updateRungs(newRungs)
 
-    if (incrementedCursorAdd) {
-      incrementCursor(-1)
-      setIncrementedCursorAdd(false)
+    let toIncrement = -1
+    if (
+      addCursorMovement &&
+      addCursorMovement.newOrder === rungToDelete.order
+    ) {
+      toIncrement = addCursorMovement.origin - addCursorMovement.newOrder
+      setAddCursorMovement(undefined)
     }
+    if (cursor === 0) toIncrement = 0
+    incrementCursor(toIncrement)
   }
 
   function addNewRung(order: number) {
+    setAddCursorMovement({ origin: cursor, newOrder: order })
+    const toIncrement = order - cursor
+    incrementCursor(toIncrement)
+    console.log(toIncrement, order, cursor)
     props.addNewRung(order)
-
-    if (order > cursor) {
-      incrementCursor(1)
-      setIncrementedCursorAdd(true)
-    }
   }
 
   function onRungClick(rung: rung) {
@@ -140,6 +146,9 @@ export default function RungsList(props: RungsListProps) {
   }
 
   function cancelEdit() {
+    const newRungs = [...props.rungs]
+    const rungToStopEdit = newRungs[cursor]
+    if (rungToStopEdit.new) handleDelete(rungToStopEdit.id)
     props.setEditingRungId(undefined)
   }
 
