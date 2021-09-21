@@ -27,7 +27,7 @@ type RungsListProps = {
 }
 
 export default function RungsList(props: RungsListProps) {
-  const [movingRungId, setMovingRungId] = useState<string>() // Id of moving rung
+  const [movingRungId, _setMovingRungId] = useState<string>() // Id of moving rung
   const [droppedSpacer, setDroppedSpacer] = useState<number>() // prevOrder
   const [addCursorMovement, setAddCursorMovement] =
     useState<{ origin: number; newOrder: number }>()
@@ -61,12 +61,20 @@ export default function RungsList(props: RungsListProps) {
     }
   )
 
+  function setMovingRungId(rungId: string) {
+    _setMovingRungId(rungId)
+    if (!rungId) return
+    const rungIndex = props.rungs.findIndex((e) => e.id === rungId)
+    const toIncrement = rungIndex - props.cursor
+    props.incrementCursor(toIncrement)
+  }
+
   function handleMove() {
     if (!isUser()) return
     const newRungs = [...props.rungs]
     const rungIndex = newRungs.findIndex((e) => e.id === movingRungId)
     const rungToMove = newRungs[rungIndex]
-    const oldOrder = rungToMove.order
+    const oldOrder = rungIndex
     const newOrder = droppedSpacer + 1
     if (oldOrder === newOrder) return
 
@@ -88,14 +96,19 @@ export default function RungsList(props: RungsListProps) {
       1
     )
 
+    const actualNewOrder = newRungs.findIndex((e) => e.id === rungToMove.id)
+
     // Reset stuff
     setMovingRungId(undefined)
     setDroppedSpacer(undefined)
 
     //Call parent functions
-    rungToMove.order = newOrder
+    rungToMove.order = actualNewOrder
     props.onRungMove(rungToMove)
     props.updateRungs(newRungs)
+
+    const toIncrement = actualNewOrder - props.cursor
+    props.incrementCursor(toIncrement)
   }
 
   async function handleEdit(newRung: rung) {
@@ -152,6 +165,9 @@ export default function RungsList(props: RungsListProps) {
 
   function onRungClick(rung: rung) {
     if (!isUser()) return
+    const rungIndex = props.rungs.findIndex((e) => e.id === rung.id)
+    const toIncrement = rungIndex - props.cursor
+    props.incrementCursor(toIncrement)
     props.onRungClick(rung)
   }
 
