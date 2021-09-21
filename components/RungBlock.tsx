@@ -22,6 +22,7 @@ type RungBlockProps = {
   onDelete?: (rungId: string) => void
   rungValidator: (rung: rung) => boolean
   selected: boolean
+  moveKey: boolean
 }
 
 export default function RungBlock(props: RungBlockProps) {
@@ -88,9 +89,10 @@ export default function RungBlock(props: RungBlockProps) {
       ref={drag}
       className={`
       ${styles.container}
-      ${isDragging ? styles.containerIsDragging : ""}
-      ${props.rung.new ? styles.containerNew : ""}
-      ${props.selected ? styles.containerSelected : ""}
+      ${isDragging ? styles.draggingContainer : ""}
+      ${props.rung.new ? styles.newContainer : ""}
+      ${props.selected ? styles.selectedContainer : ""}
+      ${props.moveKey && props.selected ? styles.draggingContainer : ""}
       `}
       onBlur={handleSubmit}
       onClick={() => props.onClick(props.rung)}

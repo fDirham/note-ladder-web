@@ -29,20 +29,19 @@ export default function useKeyboardControls(
   useKeyTap("ArrowDown", handleDown)
   useKeyTap("ArrowRight", handleRight)
   useKeyTap("ArrowLeft", handleLeft)
-  useKeyTap("e", handleE)
-  useKeyTap("d", handleD)
   useKeyTap("Escape", handleEscape)
   useKeyTap("Enter", handleEnter)
   useKeyTap(" ", handleSpace)
+  useKeyTap("d", handleD)
+  useKeyTap("e", handleE)
+  useKeyTap("i", handleI)
+  useKeyTap("o", handleO)
+  useKeyTap("O", handleUpO)
   const shift = useKeyHold("Shift")
   const moveKey = useKeyHold(specialKeys.MOVE_KEY)
 
   const selectedRung = rungs[cursor]
   const noEffect = editingRung || !selectedRung || loading
-  function handleEscape() {
-    if (!editingRung) return keyboardFunctions.goBack()
-    keyboardFunctions.cancelEdit()
-  }
 
   function handleUp() {
     if (noEffect) return
@@ -74,11 +73,19 @@ export default function useKeyboardControls(
     keyboardFunctions.goBack()
   }
 
+  function handleEscape() {
+    if (!editingRung) return keyboardFunctions.goBack()
+    keyboardFunctions.cancelEdit()
+  }
+
   function handleEnter() {
-    if (editingRung || loading) return
-    if (!selectedRung) return keyboardFunctions.addNewRung(0)
-    const increment = shift ? 0 : 1
-    keyboardFunctions.addNewRung(cursor + increment)
+    if (noEffect) return
+    keyboardFunctions.enterRung(selectedRung)
+  }
+
+  function handleSpace() {
+    if (noEffect) return
+    keyboardFunctions.enterRung(selectedRung)
   }
 
   function handleD() {
@@ -91,10 +98,22 @@ export default function useKeyboardControls(
     keyboardFunctions.editRung(selectedRung)
   }
 
-  function handleSpace() {
+  function handleI() {
     if (noEffect) return
-    keyboardFunctions.enterRung(selectedRung)
+    keyboardFunctions.editRung(selectedRung)
   }
 
-  return null
+  function handleO() {
+    if (editingRung || loading) return
+    if (!selectedRung) return keyboardFunctions.addNewRung(0)
+    keyboardFunctions.addNewRung(cursor + 1)
+  }
+
+  function handleUpO() {
+    if (editingRung || loading) return
+    if (!selectedRung) return keyboardFunctions.addNewRung(0)
+    keyboardFunctions.addNewRung(cursor)
+  }
+
+  return { moveKey }
 }

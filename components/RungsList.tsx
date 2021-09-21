@@ -3,6 +3,7 @@ import useKeyboardControls from "hooks/useKeyboardControls"
 import { useRouter } from "next/dist/client/router"
 import React, { useEffect, useState } from "react"
 import { rung } from "types/rungs"
+import { isPropertyAccessExpression } from "typescript"
 import { tempRungName } from "utilities/constants"
 import RungBlock from "./RungBlock"
 import styles from "./RungsList.module.scss"
@@ -45,7 +46,7 @@ export default function RungsList(props: RungsListProps) {
   }, [droppedSpacer, movingRungId])
 
   const { cursor, incrementCursor } = props
-  useKeyboardControls(
+  const { moveKey } = useKeyboardControls(
     cursor,
     incrementCursor,
     !!props.editingRungId,
@@ -197,6 +198,9 @@ export default function RungsList(props: RungsListProps) {
 
   return (
     <div className={styles.container}>
+      {!props.rungs.length && (
+        <div className={styles.textEmpty}>Empty list</div>
+      )}
       {props.rungs.map((rung, index) => {
         return (
           <div key={`rung-${index}`} className={styles.containerRung}>
@@ -219,6 +223,7 @@ export default function RungsList(props: RungsListProps) {
               rungValidator={props.rungValidator}
               onClick={onRungClick}
               selected={index === cursor}
+              moveKey={moveKey}
             />
             <RungSpacer
               key={`spacer-${index}`}

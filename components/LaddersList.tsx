@@ -60,6 +60,7 @@ export default function LaddersList(props: LaddersListProps) {
         accessToken
       )
       if (!createdLadder) return null
+      handleRungClick(ladderToRung(createdLadder))
       return ladderToRung(createdLadder)
     } catch (error) {
       return null

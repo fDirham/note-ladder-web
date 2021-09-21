@@ -18,15 +18,20 @@
   }
 }
 
-.containerIsDragging {
+.draggingContainer {
   opacity: 0.3;
+  form {
+    input {
+      border-color: $accentColor;
+    }
+  }
 }
 
-.containerNew {
+.newContainer {
   opacity: 0.4;
 }
 
-.containerSelected {
+.selectedContainer {
   form {
     input {
       padding-top: 1.2rem;
