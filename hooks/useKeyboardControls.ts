@@ -20,8 +20,6 @@ export default function useKeyboardControls(
   rungs: rung[],
   keyboardFunctions: keyboardFunctions
 ) {
-  useKeyTap("ArrowUp", handleUp)
-  useKeyTap("ArrowDown", handleDown)
   useKeyTap("ArrowRight", handleRight)
   useKeyTap("ArrowLeft", handleLeft)
   useKeyTap("e", handleE)
@@ -36,22 +34,6 @@ export default function useKeyboardControls(
   function handleEscape() {
     if (!editingRung) return keyboardFunctions.goBack()
     keyboardFunctions.cancelEdit()
-  }
-
-  function handleUp() {
-    if (noEffect) return
-    if (shift) {
-      const toIncrement = 0 - cursor
-      incrementCursor(toIncrement)
-    }
-  }
-
-  function handleDown() {
-    if (noEffect) return
-    if (shift) {
-      const toIncrement = rungs.length - cursor - 1
-      incrementCursor(toIncrement)
-    }
   }
 
   function handleRight() {

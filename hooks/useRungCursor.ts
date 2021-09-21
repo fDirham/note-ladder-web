@@ -38,6 +38,7 @@ export default function useRungCursor(
 
   const upPress = useKeyHold("ArrowUp")
   const downPress = useKeyHold("ArrowDown")
+  const shift = useKeyHold("Shift")
 
   function wrappedIncrementCursor(incrementBy: number) {
     let newCursor = cursor + incrementBy
@@ -50,6 +51,15 @@ export default function useRungCursor(
   useEffect(() => {
     if (disabled || !maxLength) return
     let cursorPress = upPress || downPress
+    if (shift) {
+      if (upPress) {
+        wrappedIncrementCursor(-cursor)
+      }
+      if (downPress) {
+        wrappedIncrementCursor(maxLength - cursor - 1)
+      }
+      return
+    }
     if (upPress) {
       wrappedIncrementCursor(-1)
       if (!cursorMoveTimeoutRef.current)

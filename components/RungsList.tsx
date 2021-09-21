@@ -133,6 +133,7 @@ export default function RungsList(props: RungsListProps) {
     }
     if (cursor === 0) toIncrement = 0
     incrementCursor(toIncrement)
+    if (!newRungs.length) goBack()
   }
 
   function addNewRung(order: number) {
