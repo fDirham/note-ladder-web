@@ -10,8 +10,13 @@ export type keyboardFunctions = {
   goBack: () => void
   addNewRung: (order: number) => void
   deleteRung: (rungId: string) => void
+  setMovingRungId: (rungId: string) => void
+  setDroppedSpacer: (prevOrder: number) => void
 }
 
+export enum specialKeys {
+  MOVE_KEY = "a",
+}
 export default function useKeyboardControls(
   cursor: number,
   incrementCursor: (increment: number) => void,
@@ -20,6 +25,8 @@ export default function useKeyboardControls(
   rungs: rung[],
   keyboardFunctions: keyboardFunctions
 ) {
+  useKeyTap("ArrowUp", handleUp)
+  useKeyTap("ArrowDown", handleDown)
   useKeyTap("ArrowRight", handleRight)
   useKeyTap("ArrowLeft", handleLeft)
   useKeyTap("e", handleE)
@@ -28,12 +35,33 @@ export default function useKeyboardControls(
   useKeyTap("Enter", handleEnter)
   useKeyTap(" ", handleSpace)
   const shift = useKeyHold("Shift")
+  const moveKey = useKeyHold(specialKeys.MOVE_KEY)
 
   const selectedRung = rungs[cursor]
   const noEffect = editingRung || !selectedRung || loading
   function handleEscape() {
     if (!editingRung) return keyboardFunctions.goBack()
     keyboardFunctions.cancelEdit()
+  }
+
+  function handleUp() {
+    if (noEffect) return
+    if (moveKey) {
+      keyboardFunctions.setMovingRungId(selectedRung.id)
+      let toDropAt = cursor - 2
+      if (toDropAt < -1) toDropAt = rungs.length - 1
+      keyboardFunctions.setDroppedSpacer(toDropAt)
+    }
+  }
+
+  function handleDown() {
+    if (noEffect) return
+    if (moveKey) {
+      keyboardFunctions.setMovingRungId(selectedRung.id)
+      let toDropAt = cursor + 1
+      if (toDropAt > rungs.length - 1) toDropAt = -1
+      keyboardFunctions.setDroppedSpacer(toDropAt)
+    }
   }
 
   function handleRight() {

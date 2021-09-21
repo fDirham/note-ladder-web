@@ -58,6 +58,8 @@ export default function RungsList(props: RungsListProps) {
       goBack: goBack,
       addNewRung: addNewRung,
       deleteRung: handleDelete,
+      setMovingRungId: setMovingRungId,
+      setDroppedSpacer: setDroppedSpacer,
     }
   )
 

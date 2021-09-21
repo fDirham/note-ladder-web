@@ -51,7 +51,7 @@ export default function RungBlock(props: RungBlockProps) {
   function scrollToBlock() {
     const windowHeight = window.innerHeight
     const boundingClientRectTop = inputRef.current.getBoundingClientRect().top
-    const yOffset = 40
+    const yOffset = 150
     const needScroll =
       boundingClientRectTop > windowHeight - yOffset ||
       boundingClientRectTop < yOffset

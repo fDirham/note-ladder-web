@@ -1,5 +1,6 @@
 import { cursorStateType, useCursorState } from "globalStates/useCursorStore"
 import { useEffect, useRef, useState } from "react"
+import { specialKeys } from "./useKeyboardControls"
 import useKeyHold from "./useKeyHold"
 
 const timeoutMs = 750
@@ -39,9 +40,10 @@ export default function useRungCursor(
   const upPress = useKeyHold("ArrowUp")
   const downPress = useKeyHold("ArrowDown")
   const shift = useKeyHold("Shift")
+  const moveKey = useKeyHold(specialKeys.MOVE_KEY)
 
   useEffect(() => {
-    if (disabled || !maxLength) return
+    if (disabled || !maxLength || moveKey) return
     let cursorPress = upPress || downPress
     if (shift) {
       if (upPress) {
