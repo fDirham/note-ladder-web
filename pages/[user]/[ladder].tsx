@@ -113,31 +113,28 @@ export default function LadderPage() {
   }
 
   return (
-    <>
-      <LoadingOverlay enabled={loading} />
-      <PageWrapper>
-        {currentLadder && (
-          <>
-            <EditableLadderTitle
-              onSubmit={handleChangeName}
-              title={currentLadder.name}
-            />
-            <div className={styles.containerSpace}>
-              <p onClick={goToUser}>{author}</p>
-            </div>
+    <PageWrapper loading={loading}>
+      {currentLadder && (
+        <>
+          <EditableLadderTitle
+            onSubmit={handleChangeName}
+            title={currentLadder.name}
+          />
+          <div className={styles.containerSpace}>
+            <p onClick={goToUser}>{author}</p>
+          </div>
 
-            <NotesList
-              notes={currentLadder.notes}
-              editingNoteId={editingNoteId}
-              setEditingNoteId={setEditingNoteId}
-              updateNotes={updateLadderNotes}
-              addNewNote={addNewNote}
-              ladderId={currentLadder.id}
-              loading={loading}
-            />
-          </>
-        )}
-      </PageWrapper>
-    </>
+          <NotesList
+            notes={currentLadder.notes}
+            editingNoteId={editingNoteId}
+            setEditingNoteId={setEditingNoteId}
+            updateNotes={updateLadderNotes}
+            addNewNote={addNewNote}
+            ladderId={currentLadder.id}
+            loading={loading}
+          />
+        </>
+      )}
+    </PageWrapper>
   )
 }

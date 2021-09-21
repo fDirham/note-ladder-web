@@ -114,30 +114,27 @@ export default function UserPage() {
   if (networkError) return <div>Network error LOL</div>
 
   return (
-    <>
-      <LoadingOverlay enabled={loading} />
-      <PageWrapper>
-        <h1>{currentDisplayName}</h1>
-        {currentUser && (
-          <>
-            <div className={styles.containerSpace}>
-              {isUser() && (
-                <>
-                  <button onClick={logOut}>Logout</button>
-                </>
-              )}
-            </div>
-            <LaddersList
-              ladders={currentUser.ladders || []}
-              updateLadders={updateUserLadders}
-              addNewLadder={addNewLadder}
-              editingLadderId={editingLadderId}
-              setEditingLadderId={setEditingLadderId}
-              loading={loading}
-            />
-          </>
-        )}
-      </PageWrapper>
-    </>
+    <PageWrapper loading={loading}>
+      <h1>{currentDisplayName}</h1>
+      {currentUser && (
+        <>
+          <div className={styles.containerSpace}>
+            {isUser() && (
+              <>
+                <button onClick={logOut}>Logout</button>
+              </>
+            )}
+          </div>
+          <LaddersList
+            ladders={currentUser.ladders || []}
+            updateLadders={updateUserLadders}
+            addNewLadder={addNewLadder}
+            editingLadderId={editingLadderId}
+            setEditingLadderId={setEditingLadderId}
+            loading={loading}
+          />
+        </>
+      )}
+    </PageWrapper>
   )
 }
