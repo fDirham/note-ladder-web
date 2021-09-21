@@ -3,9 +3,9 @@ import { devtools } from "zustand/middleware"
 
 export type cursorStateType = {
   ladderCursor: number
-  incrementLadderCursor: (incrementBy: number) => number
+  incrementLadderCursor: (incrementBy: number, maxLength?: number) => number
   noteCursor: number
-  incrementNoteCursor: (incrementBy: number) => number
+  incrementNoteCursor: (incrementBy: number, maxLength?: number) => number
   setState: SetState<cursorStateType>
   getState: GetState<cursorStateType>
   resetState: () => void
@@ -37,14 +37,24 @@ export const useCursorState = createStore(
     get: GetState<cursorStateType>
   ): cursorStateType => ({
     ladderCursor: initialStoreValues.ladderCursor,
-    incrementLadderCursor: (incrementBy: number) => {
+    incrementLadderCursor: (incrementBy: number, maxLength?: number) => {
       let newCursor = get().ladderCursor + incrementBy
+      // Wrapped
+      if (maxLength) {
+        if (newCursor < 0) newCursor = maxLength - 1
+        if (newCursor >= maxLength) newCursor = 0
+      }
       set({ ladderCursor: newCursor })
       return newCursor
     },
     noteCursor: initialStoreValues.noteCursor,
-    incrementNoteCursor: (incrementBy: number) => {
+    incrementNoteCursor: (incrementBy: number, maxLength?: number) => {
       let newCursor = get().noteCursor + incrementBy
+      // Wrapped
+      if (maxLength) {
+        if (newCursor < 0) newCursor = maxLength - 1
+        if (newCursor >= maxLength) newCursor = 0
+      }
       set({ noteCursor: newCursor })
       return newCursor
     },

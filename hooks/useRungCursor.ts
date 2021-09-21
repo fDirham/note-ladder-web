@@ -20,7 +20,7 @@ export default function useRungCursor(
   } = cursorState
 
   let cursor: number
-  let incrementCursor: (incrementBy: number) => void
+  let incrementCursor: (incrementBy: number, maxLength?: number) => void
 
   switch (type) {
     case "ladder":
@@ -40,44 +40,36 @@ export default function useRungCursor(
   const downPress = useKeyHold("ArrowDown")
   const shift = useKeyHold("Shift")
 
-  function wrappedIncrementCursor(incrementBy: number) {
-    let newCursor = cursor + incrementBy
-    if (newCursor < 0) newCursor = maxLength - 1
-    if (newCursor >= maxLength) newCursor = 0
-    const toIncrement = newCursor - cursor
-    incrementCursor(toIncrement)
-  }
-
   useEffect(() => {
     if (disabled || !maxLength) return
     let cursorPress = upPress || downPress
     if (shift) {
       if (upPress) {
-        wrappedIncrementCursor(-cursor)
+        incrementCursor(-cursor)
       }
       if (downPress) {
-        wrappedIncrementCursor(maxLength - cursor - 1)
+        incrementCursor(maxLength - cursor - 1)
       }
       return
     }
     if (upPress) {
-      wrappedIncrementCursor(-1)
+      incrementCursor(-1, maxLength)
       if (!cursorMoveTimeoutRef.current)
         cursorMoveTimeoutRef.current = setTimeout(() => {
           if (!cursorMoveIntervalRef.current)
             cursorMoveIntervalRef.current = setInterval(() => {
-              wrappedIncrementCursor(-1)
+              incrementCursor(-1, maxLength)
             }, intervalMs)
         }, timeoutMs)
     }
 
     if (downPress) {
-      wrappedIncrementCursor(1)
+      incrementCursor(1, maxLength)
       if (!cursorMoveTimeoutRef.current)
         cursorMoveTimeoutRef.current = setTimeout(() => {
           if (!cursorMoveIntervalRef.current)
             cursorMoveIntervalRef.current = setInterval(() => {
-              wrappedIncrementCursor(1)
+              incrementCursor(1, maxLength)
             }, intervalMs)
         }, timeoutMs)
     }
