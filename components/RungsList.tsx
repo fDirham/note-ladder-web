@@ -125,11 +125,11 @@ export default function RungsList(props: RungsListProps) {
         return handleDelete(originalNewId)
       } else newRung.id = createdRung.id
     }
+    await props.onEdit(newRung)
     const rungIndex = newRungs.findIndex((e) => e.id === originalNewId)
     newRungs.splice(rungIndex, 1, newRung)
     props.updateRungs(newRungs)
 
-    if (!newRung.new) props.onEdit(newRung)
     if (addCursorMovement) setAddCursorMovement(undefined)
   }
 
