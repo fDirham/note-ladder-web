@@ -32,6 +32,12 @@ export default function RungsList(props: RungsListProps) {
   const router = useRouter()
 
   useEffect(() => {
+    if (!props.loading && props.rungs && !props.rungs.length) {
+      addNewRung(0)
+    }
+  }, [props.rungs, props.loading])
+
+  useEffect(() => {
     if (movingRungId && typeof droppedSpacer === "number") handleMove()
   }, [droppedSpacer, movingRungId])
 

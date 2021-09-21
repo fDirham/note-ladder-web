@@ -10,6 +10,7 @@ import EditableLadderTitle from "components/EditableLadderTitle"
 import { authStateType, useAuthState } from "globalStates/useAuthStore"
 import { cacheStateType, useCacheState } from "globalStates/useCacheStore"
 import PageWrapper from "components/PageWrapper"
+import LoadingOverlay from "components/LoadingOverlay"
 
 export default function LadderPage() {
   const router = useRouter()
@@ -106,31 +107,37 @@ export default function LadderPage() {
     await LadderController.editLadder(currentLadder.id, newName, accessToken)
   }
 
-  return (
-    <PageWrapper>
-      {loading && <div>Loading...</div>}
-      {currentLadder && (
-        <>
-          <EditableLadderTitle
-            onSubmit={handleChangeName}
-            title={currentLadder.name}
-          />
-          <p onClick={goToUser}>{author}</p>
+  function isUser() {
+    if (!currentAuthorUser || !authState.uid) return false
+    return currentAuthorUser.uid === authState.uid
+  }
 
-          {(!currentLadder.notes || !currentLadder.notes.length) && (
-            <button onClick={() => addNewNote(0)}>Add note</button>
-          )}
-          <NotesList
-            notes={currentLadder.notes}
-            editingNoteId={editingNoteId}
-            setEditingNoteId={setEditingNoteId}
-            updateNotes={updateLadderNotes}
-            addNewNote={addNewNote}
-            ladderId={currentLadder.id}
-            loading={loading}
-          />
-        </>
-      )}
-    </PageWrapper>
+  return (
+    <>
+      <LoadingOverlay enabled={loading} />
+      <PageWrapper>
+        {currentLadder && (
+          <>
+            <EditableLadderTitle
+              onSubmit={handleChangeName}
+              title={currentLadder.name}
+            />
+            <div className={styles.containerSpace}>
+              <p onClick={goToUser}>{author}</p>
+            </div>
+
+            <NotesList
+              notes={currentLadder.notes}
+              editingNoteId={editingNoteId}
+              setEditingNoteId={setEditingNoteId}
+              updateNotes={updateLadderNotes}
+              addNewNote={addNewNote}
+              ladderId={currentLadder.id}
+              loading={loading}
+            />
+          </>
+        )}
+      </PageWrapper>
+    </>
   )
 }

@@ -27,10 +27,12 @@
 }
 
 .containerSelected {
-  transform: scale(1.2);
   form {
     input {
-      border: solid 1px black;
+      padding-top: 1.2rem;
+      padding-bottom: 1.2rem;
+      font-weight: 600;
+      border: solid 2px black;
     }
   }
 }

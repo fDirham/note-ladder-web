@@ -1,5 +1,10 @@
-.container {
+@import "styles/util/base";
+
+.containerSpace {
+  height: 2rem;
   display: flex;
   align-items: center;
-  flex-direction: column;
+  flex-direction: row;
+  padding: 0.2rem;
+  margin-bottom: 2.2rem;
 }

@@ -10,6 +10,7 @@ import LaddersList from "components/LaddersList"
 import { cacheStateType, useCacheState } from "globalStates/useCacheStore"
 import { cursorStateType, useCursorState } from "globalStates/useCursorStore"
 import PageWrapper from "components/PageWrapper"
+import LoadingOverlay from "components/LoadingOverlay"
 
 export default function UserPage() {
   const router = useRouter()
@@ -113,29 +114,30 @@ export default function UserPage() {
   if (networkError) return <div>Network error LOL</div>
 
   return (
-    <PageWrapper>
-      <h1>{currentDisplayName}</h1>
-      {loading && <div>Loading...</div>}
-      {currentUser && (
-        <>
-          {isUser() && (
-            <>
-              <button onClick={logOut}>Logout</button>
-              {(!currentUser.ladders || !currentUser.ladders.length) && (
-                <button onClick={() => addNewLadder(0)}>New ladder</button>
+    <>
+      <LoadingOverlay enabled={loading} />
+      <PageWrapper>
+        <h1>{currentDisplayName}</h1>
+        {currentUser && (
+          <>
+            <div className={styles.containerSpace}>
+              {isUser() && (
+                <>
+                  <button onClick={logOut}>Logout</button>
+                </>
               )}
-            </>
-          )}
-          <LaddersList
-            ladders={currentUser.ladders || []}
-            updateLadders={updateUserLadders}
-            addNewLadder={addNewLadder}
-            editingLadderId={editingLadderId}
-            setEditingLadderId={setEditingLadderId}
-            loading={loading}
-          />
-        </>
-      )}
-    </PageWrapper>
+            </div>
+            <LaddersList
+              ladders={currentUser.ladders || []}
+              updateLadders={updateUserLadders}
+              addNewLadder={addNewLadder}
+              editingLadderId={editingLadderId}
+              setEditingLadderId={setEditingLadderId}
+              loading={loading}
+            />
+          </>
+        )}
+      </PageWrapper>
+    </>
   )
 }
