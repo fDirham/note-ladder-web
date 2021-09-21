@@ -33,7 +33,7 @@ export default function UserPage() {
   }
   const [currentUser, setCurrentUser] = useState<user>()
   const [editingLadderId, setEditingLadderId] = useState<string>() // Ladder id being edited
-  const [networkError, setNetworkError] = useState<boolean>(false)
+  const [notFound, setNotFound] = useState<boolean>(false)
   const [loading, setLoading] = useState<boolean>(true)
   const _notMounted = useRef(false)
 
@@ -70,11 +70,7 @@ export default function UserPage() {
   }
 
   function handleNotFound() {
-    if (authState.uid) {
-      return setNetworkError(true)
-    }
-    window.alert("User not found")
-    router.push("/")
+    return setNotFound(true)
   }
 
   async function logOut() {
@@ -111,7 +107,7 @@ export default function UserPage() {
     setCurrentUser(newUser)
   }
 
-  if (networkError) return <div>Network error LOL</div>
+  if (notFound) return <div>User not found</div>
 
   return (
     <PageWrapper loading={loading}>

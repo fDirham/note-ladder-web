@@ -1,6 +1,41 @@
+@import "styles/util/base";
+
 .container {
+  h2 {
+    font-family: $fontFamilyText;
+    font-weight: normal;
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+  }
   form {
     display: flex;
     flex-direction: column;
+    padding: $blockPadding;
+    background-color: $gray;
+    border-radius: 10px;
+
+    input {
+      width: 100%;
+      height: 100%;
+      padding: 0.8rem;
+      background-color: white;
+      border-radius: 5px;
+      border: none;
+      margin-bottom: 0.5rem;
+    }
+
+    .textOther {
+      text-decoration: underline;
+      margin: 5px 0;
+      cursor: pointer;
+    }
+    .textOther:hover {
+      opacity: 0.5;
+    }
+
+    .textError {
+      color: $errorColor;
+      font-weight: bold;
+    }
   }
 }
