@@ -132,6 +132,7 @@ export default function UserPage() {
             editingLadderId={editingLadderId}
             setEditingLadderId={setEditingLadderId}
             loading={loading}
+            author={currentUser.uid}
           />
         </>
       )}

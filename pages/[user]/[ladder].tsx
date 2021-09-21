@@ -132,6 +132,7 @@ export default function LadderPage() {
             addNewNote={addNewNote}
             ladderId={currentLadder.id}
             loading={loading}
+            author={currentAuthorUser.uid}
           />
         </>
       )}

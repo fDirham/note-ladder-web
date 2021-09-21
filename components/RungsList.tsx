@@ -1,3 +1,4 @@
+import { authStateType, useAuthState } from "globalStates/useAuthStore"
 import useKeyboardControls from "hooks/useKeyboardControls"
 import { useRouter } from "next/dist/client/router"
 import React, { useEffect, useState } from "react"
@@ -22,6 +23,7 @@ type RungsListProps = {
   cursor: number
   incrementCursor: (incrementBy: number) => void
   loading: boolean
+  author: string
 }
 
 export default function RungsList(props: RungsListProps) {
@@ -30,6 +32,7 @@ export default function RungsList(props: RungsListProps) {
   const [addCursorMovement, setAddCursorMovement] =
     useState<{ origin: number; newOrder: number }>()
   const router = useRouter()
+  const authState: authStateType = useAuthState()
 
   useEffect(() => {
     if (!props.loading && props.rungs && !props.rungs.length) {
@@ -59,6 +62,7 @@ export default function RungsList(props: RungsListProps) {
   )
 
   function handleMove() {
+    if (!isUser()) return
     const newRungs = [...props.rungs]
     const rungIndex = newRungs.findIndex((e) => e.id === movingRungId)
     const rungToMove = newRungs[rungIndex]
@@ -95,6 +99,7 @@ export default function RungsList(props: RungsListProps) {
   }
 
   async function handleEdit(newRung: rung) {
+    if (!isUser()) return
     const newRungs = [...props.rungs]
     const originalNewId = newRung.id
     if (newRung.new) {
@@ -113,6 +118,7 @@ export default function RungsList(props: RungsListProps) {
   }
 
   function handleDelete(rungId: string) {
+    if (!isUser()) return
     const newRungs = [...props.rungs]
     const rungIndex = newRungs.findIndex((e) => e.id === rungId)
     const rungToDelete = newRungs[rungIndex]
@@ -137,6 +143,7 @@ export default function RungsList(props: RungsListProps) {
   }
 
   function addNewRung(order: number) {
+    if (!isUser()) return
     setAddCursorMovement({ origin: cursor, newOrder: order })
     const toIncrement = order - cursor
     incrementCursor(toIncrement)
@@ -144,14 +151,17 @@ export default function RungsList(props: RungsListProps) {
   }
 
   function onRungClick(rung: rung) {
+    if (!isUser()) return
     props.onRungClick(rung)
   }
 
   function setEditRung(rung: rung) {
+    if (!isUser()) return
     props.setEditingRungId(rung.id)
   }
 
   function cancelEdit() {
+    if (!isUser()) return
     const newRungs = [...props.rungs]
     const rungToStopEdit = newRungs[cursor]
     if (rungToStopEdit.new) handleDelete(rungToStopEdit.id)
@@ -160,6 +170,11 @@ export default function RungsList(props: RungsListProps) {
 
   function goBack() {
     router.push("/" + router.query.user)
+  }
+
+  function isUser() {
+    if (!authState.uid) return false
+    return props.author === authState.uid
   }
 
   return (

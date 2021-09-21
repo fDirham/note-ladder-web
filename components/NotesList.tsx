@@ -15,6 +15,7 @@ type NotesListProps = {
   setEditingNoteId: (newId: string) => void
   ladderId: string
   loading: boolean
+  author: string
 }
 
 export default function NotesList(props: NotesListProps) {
@@ -104,6 +105,7 @@ export default function NotesList(props: NotesListProps) {
       incrementCursor={incrementCursor}
       deleteRung={handleDelete}
       loading={props.loading}
+      author={props.author}
     />
   )
 }
