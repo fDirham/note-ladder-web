@@ -21,12 +21,6 @@ export default function Home() {
 
   return (
     <div className={styles.container}>
-      <Head>
-        <title>Note Ladder</title>
-        <meta name="description" content="FBD's note taking app" />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-
       <main className={styles.main}>
         <PageWrapper loading={false}>
           <h1 className={styles.title}>Note Ladder</h1>
