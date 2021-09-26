@@ -16,6 +16,7 @@ type RungListContainerProps = {
 export default function RungListContainer(props: RungListContainerProps) {
   const [movingRungId, setMovingRungId] = useState<string>(); // Id of moving rung
   const [droppedSpacer, setDroppedSpacer] = useState<number>(); // prevOrder
+  const [editingRungId, setEditingRungId] = useState<string>(); // Id of editing rung
 
   const rungActions = useRungActions(
     props.parentRung,
@@ -34,8 +35,10 @@ export default function RungListContainer(props: RungListContainerProps) {
     if (movingRungId && typeof droppedSpacer === "number") handleMove();
   }, [droppedSpacer, movingRungId]);
 
-  async function addNewRung(order: number) {
-    await rungActions.createNewRung(order);
+  function addNewRung(order: number) {
+    const newRung = rungActions.createNewRung(order);
+    if (newRung) return setEditingRungId(newRung.id);
+    if (props.rungList.length) setEditingRungId(props.rungList[0].id);
   }
 
   async function handleMove() {
@@ -45,7 +48,15 @@ export default function RungListContainer(props: RungListContainerProps) {
   }
 
   function handleRungClick(rung: rung) {
-    console.log("clicked on rung", rung);
+    setEditingRungId(rung.id);
+  }
+
+  async function handleRungEdit(editedRung: rung) {
+    setEditingRungId(undefined);
+    await rungActions.editRung(editedRung);
+  }
+  async function handleRungDelete(rungId: string) {
+    await rungActions.deleteRung(rungId);
   }
 
   return (
@@ -53,8 +64,12 @@ export default function RungListContainer(props: RungListContainerProps) {
       rungs={props.rungList}
       setDroppedSpacer={setDroppedSpacer}
       setMovingRungId={setMovingRungId}
+      editingRungId={editingRungId}
       onRungClick={handleRungClick}
+      onRungEdit={handleRungEdit}
+      onRungDelete={handleRungDelete}
       addNewRung={addNewRung}
+      loading={props.loading}
     />
   );
 }

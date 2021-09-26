@@ -14,12 +14,19 @@ export default function useRungActions(
     return authState.uid === author;
   }
 
-  async function createNewRung(order: number) {
+  function fixRungListOrder(newRungs: rung[]) {
+    newRungs.forEach((rung, index) => {
+      rung.order = index;
+    });
+  }
+
+  function createNewRung(order: number) {
+    if (rungList.length === 1 && rungList[0].new) return;
     const newRungs = [...rungList];
     const newRung: rung = {
       id: "new-rung-" + Math.random(),
       alias: parentRung.countChildren,
-      content: parentRung.countChildren + "rung",
+      content: "",
       parent: parentRung.id,
       order,
       countChildren: 0,
@@ -27,17 +34,31 @@ export default function useRungActions(
       new: true,
     };
     newRungs.splice(order, 0, newRung);
+    fixRungListOrder(newRungs);
     setRungList(newRungs);
 
     const newParentRung = {
       ...parentRung,
       countChildren: parentRung.countChildren + 1,
     };
-
     setParentRung(newParentRung);
+
+    return newRung;
   }
 
-  async function editRung() {}
+  async function editRung(editedRung: rung) {
+    if (!editedRung.content) return await deleteRung(editedRung.id);
+
+    const newRungs = [...rungList];
+    const rungIndex = newRungs.findIndex((e) => e.id === editedRung.id);
+    if (editedRung.new) {
+      editedRung.new = undefined;
+    }
+    newRungs[rungIndex] = editedRung;
+    setRungList(newRungs);
+
+    return editedRung;
+  }
 
   async function reorderRung(movingRungId: string, droppedSpacer: number) {
     const newRungs = [...rungList];
@@ -70,14 +91,26 @@ export default function useRungActions(
       1
     );
 
-    // Fix everyone's orders
-    newRungs.forEach((rung, index) => {
-      rung.order = index;
-    });
+    fixRungListOrder(newRungs);
     setRungList(newRungs);
+
+    const actualNewOrder = newRungs.findIndex((e) => e.id === rungToMove.id);
+    rungToMove.order = actualNewOrder;
+    return rungToMove;
   }
 
-  async function deleteRung() {}
+  async function deleteRung(rungId: string) {
+    if (rungList.length === 1) return;
+    const newRungs = [...rungList];
+    const rungIndex = newRungs.findIndex((e) => e.id === rungId);
+    const rungToDelete = newRungs[rungIndex];
+    if (!rungToDelete.new) {
+    }
+    newRungs.splice(rungIndex, 1);
+    fixRungListOrder(newRungs);
+    setRungList(newRungs);
+    return newRungs;
+  }
 
   return { createNewRung, editRung, reorderRung, deleteRung };
 }

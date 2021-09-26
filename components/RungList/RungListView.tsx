@@ -9,13 +9,17 @@ type RungListViewProps = {
   setDroppedSpacer: (prevNumber: number) => void;
   setMovingRungId: (movingId: string) => void;
   onRungClick: (rung: rung) => void;
+  onRungEdit: (editedRung: rung) => void;
+  onRungDelete: (rungId: string) => void;
   addNewRung: (order: number) => void;
+  editingRungId: string;
+  loading: boolean;
 };
 
 export default function RungsListView(props: RungListViewProps) {
   return (
     <div className={styles.container}>
-      {!props.rungs.length && (
+      {!props.loading && !props.rungs.length && (
         <div className={styles.textEmpty}>Empty list</div>
       )}
       {props.rungs.map((rung, index) => {
@@ -34,6 +38,9 @@ export default function RungsListView(props: RungListViewProps) {
               rung={rung}
               setMovingRungId={props.setMovingRungId}
               onClick={props.onRungClick}
+              onEdit={props.onRungEdit}
+              onDelete={props.onRungDelete}
+              editing={rung.id === props.editingRungId}
             />
             <RungSpacer
               key={`spacer-${index}`}
