@@ -1,8 +1,9 @@
-import { ladder } from "./rungs";
+import { rung } from "./rungs";
 
 export type user = {
   displayName: string;
   email: string;
   uid: string;
-  ladders?: ladder[]; // Full of ladder names
+  countLadders: number;
+  ladders?: rung[]; // Full of ladder names
 };

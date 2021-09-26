@@ -1,113 +1,86 @@
-import AuthController from "controllers/AuthController"
-import UserController from "controllers/UserController"
-import { authStateType, useAuthState } from "globalStates/useAuthStore"
-import { useRouter } from "next/dist/client/router"
-import React, { useEffect, useRef, useState } from "react"
-import { user } from "types/users"
-import styles from "styles/User.module.scss"
-import { ladder } from "types/rungs"
-import LaddersList from "components/LaddersList"
-import { cacheStateType, useCacheState } from "globalStates/useCacheStore"
-import { cursorStateType, useCursorState } from "globalStates/useCursorStore"
-import PageWrapper from "components/PageWrapper"
-import LoadingOverlay from "components/LoadingOverlay"
+import AuthController from "controllers/AuthController";
+import UserController from "controllers/UserController";
+import { authStateType, useAuthState } from "globalStates/useAuthStore";
+import { useRouter } from "next/dist/client/router";
+import React, { useEffect, useRef, useState } from "react";
+import { user } from "types/users";
+import styles from "styles/User.module.scss";
+import { cacheStateType, useCacheState } from "globalStates/useCacheStore";
+import { cursorStateType, useCursorState } from "globalStates/useCursorStore";
+import PageWrapper from "components/PageWrapper";
+import LoadingOverlay from "components/LoadingOverlay";
+import RungList from "components/RungList";
+import { rung } from "types/rungs";
 
 export default function UserPage() {
-  const router = useRouter()
-  const { user: currentDisplayName } = router.query
-  const authState: authStateType = useAuthState()
-  const cacheState: cacheStateType = useCacheState()
-  const cursorState: cursorStateType = useCursorState()
+  const router = useRouter();
+  const { user: currentDisplayName } = router.query;
+  const authState: authStateType = useAuthState();
 
-  const dummyLadders: ladder[] = [
-    { name: "ladder1", order: 0, id: "test0", author: authState.uid },
-    { name: "sometext", order: 1, id: "test1", author: authState.uid },
-    { name: "lol wtf HUH", order: 2, id: "test2", author: authState.uid },
-    { name: "HAHAHAHAH", order: 3, id: "test3", author: authState.uid },
-  ]
-  const dummyUser: user = {
-    displayName: currentDisplayName as string,
-    uid: "",
-    email: "",
-    ladders: dummyLadders,
-  }
-  const [currentUser, setCurrentUser] = useState<user>()
-  const [editingLadderId, setEditingLadderId] = useState<string>() // Ladder id being edited
-  const [notFound, setNotFound] = useState<boolean>(false)
-  const [loading, setLoading] = useState<boolean>(true)
-  const _notMounted = useRef(false)
+  const [currentUser, setCurrentUser] = useState<user>();
+  const [rungList, setRungList] = useState<rung[]>([]);
+  const [parentRung, setParentRung] = useState<rung>();
+  const [notFound, setNotFound] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
+  const _notMounted = useRef(false);
 
   useEffect(() => {
     return () => {
-      _notMounted.current = true
-    }
-  }, [])
+      _notMounted.current = true;
+    };
+  }, []);
 
   useEffect(() => {
-    getCurrentUser()
-  }, [currentDisplayName])
+    getCurrentUser();
+  }, [currentDisplayName]);
 
   async function getCurrentUser() {
-    if (!currentDisplayName || currentUser) return
-
-    const { currentUser: cachedUser } = cacheState
-    if (cachedUser && cachedUser.displayName === currentDisplayName)
-      setCurrentUser(cachedUser)
-    else {
-      cursorState.setState({ ladderCursor: 0 })
-    }
+    if (!currentDisplayName || currentUser) return;
 
     const retrievedUser = await UserController.getUser(
       currentDisplayName as string
-    )
+    );
 
-    if (_notMounted.current) return
+    if (_notMounted.current) return;
 
-    if (!retrievedUser) return handleNotFound()
-    cacheState.setState({ currentUser: retrievedUser })
-    setCurrentUser(retrievedUser)
-    setLoading(false)
+    if (!retrievedUser) return handleNotFound();
+    console.log(retrievedUser);
+    const newRungList = retrievedUser.ladders;
+    retrievedUser.ladders = undefined;
+    const newParentRung: rung = {
+      id: "",
+      alias: 0,
+      content: "",
+      parent: "",
+      order: 0,
+      countChildren: retrievedUser.countLadders,
+      author: retrievedUser.uid,
+    };
+    setParentRung(newParentRung);
+    setRungList(newRungList);
+    setCurrentUser(retrievedUser);
+    setLoading(false);
   }
 
   function handleNotFound() {
-    return setNotFound(true)
+    return setNotFound(true);
   }
 
   async function logOut() {
-    const accessToken = await authState.getAccessToken()
-    const logOutSuccess = await AuthController.logOut(accessToken)
+    const accessToken = await authState.getAccessToken();
+    const logOutSuccess = await AuthController.logOut(accessToken);
     if (!logOutSuccess)
-      return window.alert("Error logging out, try again later")
-    authState.resetState()
-    router.push("/")
-  }
-
-  function addNewLadder(order: number) {
-    const newLadders = [...currentUser.ladders]
-    const newLadder: ladder = {
-      order,
-      name: "",
-      id: "new-ladder-" + Math.random(),
-      new: true,
-      author: authState.uid,
-    }
-    newLadders.splice(order, 0, newLadder)
-    updateUserLadders(newLadders)
-    setEditingLadderId(newLadder.id)
+      return window.alert("Error logging out, try again later");
+    authState.resetState();
+    router.push("/");
   }
 
   function isUser() {
-    if (!currentUser || !authState.uid) return false
-    return currentUser.uid === authState.uid
+    if (!currentUser || !authState.uid) return false;
+    return currentUser.uid === authState.uid;
   }
 
-  function updateUserLadders(newLadders: ladder[]) {
-    const newUser = { ...currentUser }
-    newUser.ladders = newLadders
-    setCurrentUser(newUser)
-  }
-
-  if (notFound) return <div>User not found</div>
+  if (notFound) return <div>User not found</div>;
 
   return (
     <PageWrapper loading={loading}>
@@ -121,17 +94,15 @@ export default function UserPage() {
               </>
             )}
           </div>
-          <LaddersList
-            ladders={currentUser.ladders || []}
-            updateLadders={updateUserLadders}
-            addNewLadder={addNewLadder}
-            editingLadderId={editingLadderId}
-            setEditingLadderId={setEditingLadderId}
+          <RungList
+            parentRung={parentRung}
+            setParentRung={setParentRung}
+            rungList={rungList}
+            setRungList={setRungList}
             loading={loading}
-            author={currentUser.uid}
           />
         </>
       )}
     </PageWrapper>
-  )
+  );
 }

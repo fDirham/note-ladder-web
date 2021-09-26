@@ -1,7 +1,5 @@
-import useKeyTap from "hooks/useKeyTap"
 import React, {
   ChangeEvent,
-  ChangeEventHandler,
   FormEvent,
   useEffect,
   useRef,
@@ -15,14 +13,7 @@ import styles from "./RungBlock.module.scss"
 type RungBlockProps = {
   rung: rung
   setMovingRungId: (rungId: string) => void
-  editing: boolean
-  setEditingRungId: (rungId: string) => void
-  onEdit?: (newRung: rung) => void
   onClick?: (rung: rung) => void
-  onDelete?: (rungId: string) => void
-  rungValidator: (rung: rung) => boolean
-  selected: boolean
-  moveKey: boolean
 }
 
 export default function RungBlock(props: RungBlockProps) {
@@ -35,19 +26,12 @@ export default function RungBlock(props: RungBlockProps) {
     }),
   }))
 
-  useEffect(() => {
-    if (!props.editing && !stateContent) props.onDelete(props.rung.id)
-    if (props.editing) inputRef.current.focus()
-  }, [props.editing])
 
   useEffect(() => {
     const toSet = isDragging ? props.rung.id : undefined
     props.setMovingRungId(toSet)
   }, [isDragging])
 
-  useEffect(() => {
-    if (props.selected) scrollToBlock()
-  }, [props.selected])
 
   function scrollToBlock() {
     const windowHeight = window.innerHeight
@@ -65,25 +49,23 @@ export default function RungBlock(props: RungBlockProps) {
 
   async function handleSubmit(e: FormEvent) {
     if (e) e.preventDefault()
-    if (!stateContent) return props.onDelete(props.rung.id)
-    const newRung = { ...props.rung }
-    newRung.content = stateContent
-    props.onEdit(newRung)
-    stopEditing()
+  }
+
+  function validateRung(rung: rung){
+    return true
   }
 
   function handleChange(e: ChangeEvent<HTMLInputElement>) {
     const { value } = e.target
     const newRung = { ...props.rung }
     newRung.content = value
-    if (!props.rungValidator(newRung)) return
+    if (!validateRung(newRung)) return
     setStateContent(value)
   }
 
-  function stopEditing() {
-    props.setEditingRungId(undefined)
-  }
 
+      // ${props.selected ? styles.selectedContainer : ""}
+      // ${props.moveKey && props.selected ? styles.draggingContainer : ""}
   return (
     <div
       ref={drag}
@@ -91,8 +73,6 @@ export default function RungBlock(props: RungBlockProps) {
       ${styles.container}
       ${isDragging ? styles.draggingContainer : ""}
       ${props.rung.new ? styles.newContainer : ""}
-      ${props.selected ? styles.selectedContainer : ""}
-      ${props.moveKey && props.selected ? styles.draggingContainer : ""}
       `}
       onBlur={handleSubmit}
       onClick={() => props.onClick(props.rung)}
@@ -103,7 +83,7 @@ export default function RungBlock(props: RungBlockProps) {
           type="text"
           value={stateContent}
           onChange={handleChange}
-          disabled={!props.editing}
+          disabled={true}
         />
       </form>
     </div>

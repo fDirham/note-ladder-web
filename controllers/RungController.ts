@@ -1,13 +1,13 @@
 import axios from "axios";
-import { note } from "types/rungs";
+import { rung } from "types/rungs";
 
-export default class NoteController {
-  static async createNote(
+export default class RungController {
+  static async createRung(
     content: string,
     order: number,
-    ladder: string,
+    parent: string,
     accessToken: string
-  ): Promise<note | null> {
+  ): Promise<rung | null> {
     try {
       const config = {
         headers: {
@@ -16,22 +16,21 @@ export default class NoteController {
       };
       const createRes = await axios.post(
         `${process.env.NEXT_PUBLIC_API_URL}/note`,
-        { content, order, ladder },
+        { content, order, parent },
         config
       );
-      return createRes.data.note as note;
+      return createRes.data.rung as rung;
     } catch (error) {
       console.log(error);
       return null;
     }
   }
 
-  static async reorderNote(
-    noteId: string,
-    ladderId: string,
-    newOrder: number,
+  static async reorderRung(
+    rungId: string,
+    order: number,
     accessToken: string
-  ): Promise<note | null> {
+  ): Promise<rung | null> {
     try {
       const config = {
         headers: {
@@ -40,24 +39,23 @@ export default class NoteController {
       };
 
       const reorderRes = await axios.put(
-        `${process.env.NEXT_PUBLIC_API_URL}/note/reorder`,
-        { noteId, ladderId, newOrder },
+        `${process.env.NEXT_PUBLIC_API_URL}/note/reorder/${rungId}`,
+        { order },
         config
       );
 
-      return reorderRes.data.note as note;
+      return reorderRes.data.rung as rung;
     } catch (error) {
       console.log(error.response);
       return null;
     }
   }
 
-  static async editNote(
-    noteId: string,
-    ladderId: string,
-    newContent: string,
+  static async editRung(
+    rungId: string,
+    content: string,
     accessToken: string
-  ): Promise<note | null> {
+  ): Promise<rung | null> {
     try {
       const config = {
         headers: {
@@ -66,21 +64,20 @@ export default class NoteController {
       };
 
       const editRes = await axios.put(
-        `${process.env.NEXT_PUBLIC_API_URL}/note/edit`,
-        { noteId, ladderId, newContent },
+        `${process.env.NEXT_PUBLIC_API_URL}/rung/edit/${rungId}`,
+        { content },
         config
       );
 
-      return editRes.data.note as note;
+      return editRes.data.rung as rung;
     } catch (error) {
       console.log(error.response);
       return null;
     }
   }
 
-  static async deleteNote(
-    noteId: string,
-    ladderId: string,
+  static async deleteRung(
+    rungId: string,
     accessToken: string
   ): Promise<boolean> {
     try {
@@ -90,8 +87,8 @@ export default class NoteController {
         },
       };
 
-      const reorderRes = await axios.delete(
-        `${process.env.NEXT_PUBLIC_API_URL}/note/${ladderId}/${noteId}`,
+      await axios.delete(
+        `${process.env.NEXT_PUBLIC_API_URL}/rung/${rungId}`,
         config
       );
 

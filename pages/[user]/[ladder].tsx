@@ -4,13 +4,11 @@ import { useRouter } from "next/dist/client/router"
 import React, { useEffect, useRef, useState } from "react"
 import { ladder, note } from "types/rungs"
 import styles from "styles/Ladder.module.scss"
-import NotesList from "components/NotesList"
 import { user } from "types/users"
 import EditableLadderTitle from "components/EditableLadderTitle"
 import { authStateType, useAuthState } from "globalStates/useAuthStore"
 import { cacheStateType, useCacheState } from "globalStates/useCacheStore"
 import PageWrapper from "components/PageWrapper"
-import LoadingOverlay from "components/LoadingOverlay"
 
 export default function LadderPage() {
   const router = useRouter()
@@ -26,6 +24,7 @@ export default function LadderPage() {
   const _notMounted = useRef(false)
 
   useEffect(() => {
+    console.log(author, ladderId)
     return () => {
       _notMounted.current = true
     }
@@ -123,17 +122,6 @@ export default function LadderPage() {
           <div className={styles.containerSpace}>
             <p onClick={goToUser}>{author}</p>
           </div>
-
-          <NotesList
-            notes={currentLadder.notes}
-            editingNoteId={editingNoteId}
-            setEditingNoteId={setEditingNoteId}
-            updateNotes={updateLadderNotes}
-            addNewNote={addNewNote}
-            ladderId={currentLadder.id}
-            loading={loading}
-            author={currentAuthorUser.uid}
-          />
         </>
       )}
     </PageWrapper>
