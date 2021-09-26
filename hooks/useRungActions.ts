@@ -51,9 +51,10 @@ export default function useRungActions(
 
   async function editRung(editedRung: rung) {
     if (!editedRung.content) return await deleteRung(editedRung.id);
-
     const newRungs = [...rungList];
     const rungIndex = newRungs.findIndex((e) => e.id === editedRung.id);
+    const oldRung = newRungs[rungIndex];
+    if (oldRung.content === editedRung.content) return;
 
     const accessToken = await authState.getAccessToken();
     if (editedRung.new) {

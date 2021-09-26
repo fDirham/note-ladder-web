@@ -3,12 +3,9 @@ import UserController from "controllers/UserController";
 import { authStateType, useAuthState } from "globalStates/useAuthStore";
 import { useRouter } from "next/dist/client/router";
 import React, { useEffect, useRef, useState } from "react";
+import styles from "styles/LadderPage.module.scss";
 import { user } from "types/users";
-import styles from "styles/User.module.scss";
-import { cacheStateType, useCacheState } from "globalStates/useCacheStore";
-import { cursorStateType, useCursorState } from "globalStates/useCursorStore";
 import PageWrapper from "components/PageWrapper";
-import LoadingOverlay from "components/LoadingOverlay";
 import RungList from "components/RungList";
 import { rung } from "types/rungs";
 
@@ -35,7 +32,11 @@ export default function UserPage() {
   }, [currentDisplayName]);
 
   async function getCurrentUser() {
-    if (!currentDisplayName || currentUser) return;
+    if (
+      !currentDisplayName ||
+      (currentUser && currentUser.displayName === currentDisplayName)
+    )
+      return;
 
     const retrievedUser = await UserController.getUser(
       currentDisplayName as string
@@ -44,7 +45,6 @@ export default function UserPage() {
     if (_notMounted.current) return;
 
     if (!retrievedUser) return handleNotFound();
-    console.log(retrievedUser);
     const newRungList = retrievedUser.ladders;
     retrievedUser.ladders = undefined;
     const newParentRung: rung = {
@@ -59,6 +59,7 @@ export default function UserPage() {
     setParentRung(newParentRung);
     setRungList(newRungList);
     setCurrentUser(retrievedUser);
+    if (notFound) setNotFound(false);
     setLoading(false);
   }
 
@@ -84,6 +85,7 @@ export default function UserPage() {
 
   return (
     <PageWrapper loading={loading}>
+      <p className={styles.textParent}>NoteLadder by</p>
       <h1>{currentDisplayName}</h1>
       {currentUser && (
         <>

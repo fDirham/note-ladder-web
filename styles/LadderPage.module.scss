@@ -1,11 +1,20 @@
 @import "styles/util/base";
 
+.textParent {
+  font-size: small;
+  margin-bottom: 0.4rem;
+}
+
 .containerSpace {
   height: 2rem;
   display: flex;
   align-items: center;
   flex-direction: row;
   padding: 0.2rem;
-  margin-top: 1rem;
+  margin-top: 0.5rem;
   margin-bottom: 2.2rem;
+
+  .textAuthor {
+    font-weight: 500;
+  }
 }

@@ -92,6 +92,7 @@ export default function RungBlock(props: RungBlockProps) {
           type="text"
           value={stateContent}
           onChange={handleChange}
+          placeholder={"New note"}
           disabled={!props.editing}
         />
       </form>

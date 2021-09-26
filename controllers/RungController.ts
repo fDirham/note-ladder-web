@@ -2,6 +2,22 @@ import axios from "axios";
 import { rung } from "types/rungs";
 
 export default class RungController {
+  static async getLadder(
+    author: string,
+    ladderId: string
+  ): Promise<rung | null> {
+    try {
+      const getRes = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/rung/${author}/${ladderId}`
+      );
+      return getRes.data.rung as rung;
+    } catch (error) {
+      console.log(error);
+      console.log(error.response);
+      return null;
+    }
+  }
+
   static async createRung(
     content: string,
     order: number,

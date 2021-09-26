@@ -18,6 +18,7 @@ export default function RungListContainer(props: RungListContainerProps) {
   const [movingRungId, setMovingRungId] = useState<string>(); // Id of moving rung
   const [droppedSpacer, setDroppedSpacer] = useState<number>(); // prevOrder
   const [editingRungId, setEditingRungId] = useState<string>(); // Id of editing rung
+  const router = useRouter();
 
   const rungActions = useRungActions(
     props.parentRung,
@@ -54,7 +55,10 @@ export default function RungListContainer(props: RungListContainerProps) {
   }
 
   function handleRungClick(rung: rung) {
-    setEditingRungId(rung.id);
+    console.log(router);
+    const { user } = router.query;
+    if (!rung.new) router.push(`/${user}/${rung.id}`);
+    else setEditingRungId(rung.id);
   }
 
   async function handleRungEdit(editedRung: rung) {

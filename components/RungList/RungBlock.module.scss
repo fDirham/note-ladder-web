@@ -14,6 +14,8 @@
       background-color: white;
       border-radius: 5px;
       border: none;
+      font-family: $fontFamilyText;
+      font-size: 1rem;
     }
   }
 }
@@ -28,7 +30,7 @@
 }
 
 .newContainer {
-  opacity: 0.4;
+  opacity: 0.6;
 }
 
 .selectedContainer {
