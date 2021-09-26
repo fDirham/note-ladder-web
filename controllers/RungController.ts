@@ -15,7 +15,7 @@ export default class RungController {
         },
       };
       const createRes = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/note`,
+        `${process.env.NEXT_PUBLIC_API_URL}/rung`,
         { content, order, parent },
         config
       );
@@ -39,7 +39,7 @@ export default class RungController {
       };
 
       const reorderRes = await axios.put(
-        `${process.env.NEXT_PUBLIC_API_URL}/note/reorder/${rungId}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/rung/reorder/${rungId}`,
         { order },
         config
       );

@@ -1,3 +1,4 @@
+import { customErrorObj } from "components/constants/errors";
 import { authStateType, useAuthState } from "globalStates/useAuthStore";
 import useRungActions from "hooks/useRungActions";
 import { useRouter } from "next/dist/client/router";
@@ -22,7 +23,8 @@ export default function RungListContainer(props: RungListContainerProps) {
     props.parentRung,
     props.setParentRung,
     props.rungList,
-    props.setRungList
+    props.setRungList,
+    handleError
   );
 
   useEffect(() => {
@@ -34,6 +36,10 @@ export default function RungListContainer(props: RungListContainerProps) {
   useEffect(() => {
     if (movingRungId && typeof droppedSpacer === "number") handleMove();
   }, [droppedSpacer, movingRungId]);
+
+  function handleError(customErrorObj: customErrorObj) {
+    window.alert(customErrorObj.text);
+  }
 
   function addNewRung(order: number) {
     const newRung = rungActions.createNewRung(order);
@@ -55,6 +61,7 @@ export default function RungListContainer(props: RungListContainerProps) {
     setEditingRungId(undefined);
     await rungActions.editRung(editedRung);
   }
+
   async function handleRungDelete(rungId: string) {
     await rungActions.deleteRung(rungId);
   }

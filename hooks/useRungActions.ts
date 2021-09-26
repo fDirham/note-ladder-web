@@ -1,3 +1,5 @@
+import customErrors, { customErrorObj } from "components/constants/errors";
+import RungController from "controllers/RungController";
 import { authStateType, useAuthState } from "globalStates/useAuthStore";
 import { rung } from "types/rungs";
 
@@ -5,7 +7,8 @@ export default function useRungActions(
   parentRung: rung,
   setParentRung: (newRung: rung) => void,
   rungList: rung[],
-  setRungList: (newRungs: rung[]) => void
+  setRungList: (newRungs: rung[]) => void,
+  handleError: (error: customErrorObj) => void
 ) {
   const authState: authStateType = useAuthState();
 
@@ -51,9 +54,27 @@ export default function useRungActions(
 
     const newRungs = [...rungList];
     const rungIndex = newRungs.findIndex((e) => e.id === editedRung.id);
+
+    const accessToken = await authState.getAccessToken();
     if (editedRung.new) {
+      const savedRung = await RungController.createRung(
+        editedRung.content,
+        editedRung.order,
+        editedRung.parent,
+        accessToken
+      );
+      if (!savedRung) return handleError(customErrors.FAILED_CREATE);
+      editedRung.id = savedRung.id;
       editedRung.new = undefined;
+    } else {
+      const modifiedRung = await RungController.editRung(
+        editedRung.id,
+        editedRung.content,
+        accessToken
+      );
+      if (!modifiedRung) return handleError(customErrors.FAILED_EDIT);
     }
+
     newRungs[rungIndex] = editedRung;
     setRungList(newRungs);
 
@@ -96,6 +117,15 @@ export default function useRungActions(
 
     const actualNewOrder = newRungs.findIndex((e) => e.id === rungToMove.id);
     rungToMove.order = actualNewOrder;
+
+    const accessToken = await authState.getAccessToken();
+    const movedRung = await RungController.reorderRung(
+      rungToMove.id,
+      actualNewOrder,
+      accessToken
+    );
+    if (!movedRung) return handleError(customErrors.FAILED_MOVE);
+
     return rungToMove;
   }
 
@@ -104,11 +134,20 @@ export default function useRungActions(
     const newRungs = [...rungList];
     const rungIndex = newRungs.findIndex((e) => e.id === rungId);
     const rungToDelete = newRungs[rungIndex];
-    if (!rungToDelete.new) {
-    }
+
     newRungs.splice(rungIndex, 1);
     fixRungListOrder(newRungs);
     setRungList(newRungs);
+
+    if (!rungToDelete.new) {
+      const accessToken = await authState.getAccessToken();
+      const deletedRung = await RungController.deleteRung(
+        rungToDelete.id,
+        accessToken
+      );
+      if (!deletedRung) return handleError(customErrors.FAILED_DELETE);
+    }
+
     return newRungs;
   }
 
