@@ -4,12 +4,12 @@ import useKeyHold from "./useKeyHold";
 import useKeyTap from "./useKeyTap";
 
 export type keyboardFunctions = {
-  enterRung: (rungId: string) => void;
-  setRungToEdit: (rungId: string) => void;
+  enterRung: (rung: rung) => void;
+  setRungToEdit: (rung: rung) => void;
   cancelEdit: () => void;
   goBack: () => void;
   addNewRung: (order: number) => void;
-  deleteRung: (rungId: string) => void;
+  deleteRung: (rung: rung) => void;
   setMovingRungId: (rungId: string) => void;
   setDroppedSpacer: (prevOrder: number) => void;
 };
@@ -63,7 +63,7 @@ export default function useKeyboardControls(
 
   function handleRight() {
     if (noEffect) return;
-    keyboardFunctions.enterRung(selectedRung.id);
+    keyboardFunctions.enterRung(selectedRung);
   }
 
   function handleLeft() {
@@ -78,27 +78,27 @@ export default function useKeyboardControls(
 
   function handleEnter() {
     if (noEffect) return;
-    keyboardFunctions.enterRung(selectedRung.id);
+    keyboardFunctions.enterRung(selectedRung);
   }
 
   function handleSpace() {
     if (noEffect) return;
-    keyboardFunctions.enterRung(selectedRung.id);
+    keyboardFunctions.enterRung(selectedRung);
   }
 
   function handleD() {
     if (noEffect) return;
-    keyboardFunctions.deleteRung(selectedRung.id);
+    keyboardFunctions.deleteRung(selectedRung);
   }
 
   function handleE() {
     if (noEffect) return;
-    keyboardFunctions.setRungToEdit(selectedRung.id);
+    keyboardFunctions.setRungToEdit(selectedRung);
   }
 
   function handleI() {
     if (noEffect) return;
-    keyboardFunctions.setRungToEdit(selectedRung.id);
+    keyboardFunctions.setRungToEdit(selectedRung);
   }
 
   function handleO() {

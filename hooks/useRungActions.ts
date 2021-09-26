@@ -1,16 +1,21 @@
 import customErrors, { customErrorObj } from "components/constants/errors";
 import RungController from "controllers/RungController";
 import { authStateType, useAuthState } from "globalStates/useAuthStore";
+import { useRouter } from "next/dist/client/router";
 import { rung } from "types/rungs";
+import { cursorControls } from "./useCursor";
 
 export default function useRungActions(
   parentRung: rung,
   setParentRung: (newRung: rung) => void,
   rungList: rung[],
   setRungList: (newRungs: rung[]) => void,
-  handleError: (error: customErrorObj) => void
+  handleError: (error: customErrorObj) => void,
+  cursorControls: cursorControls
 ) {
   const authState: authStateType = useAuthState();
+  const router = useRouter();
+  const { cursor, prevCursor, incrementCursor, setCursor } = cursorControls;
 
   function isAuthor(author: string) {
     if (!authState.uid) return false;
@@ -114,10 +119,13 @@ export default function useRungActions(
     );
 
     fixRungListOrder(newRungs);
+    console.log(newRungs);
     setRungList(newRungs);
 
     const actualNewOrder = newRungs.findIndex((e) => e.id === rungToMove.id);
     rungToMove.order = actualNewOrder;
+    if (oldOrder === actualNewOrder) return;
+    setCursor(actualNewOrder);
 
     const accessToken = await authState.getAccessToken();
     const movedRung = await RungController.reorderRung(
@@ -131,7 +139,8 @@ export default function useRungActions(
   }
 
   async function deleteRung(rungId: string) {
-    if (rungList.length === 1) return;
+    if (rungList.length === 1 && rungList[0].new) router.back();
+
     const newRungs = [...rungList];
     const rungIndex = newRungs.findIndex((e) => e.id === rungId);
     const rungToDelete = newRungs[rungIndex];
@@ -139,6 +148,7 @@ export default function useRungActions(
     newRungs.splice(rungIndex, 1);
     fixRungListOrder(newRungs);
     setRungList(newRungs);
+    setCursor(prevCursor);
 
     if (!rungToDelete.new) {
       const accessToken = await authState.getAccessToken();

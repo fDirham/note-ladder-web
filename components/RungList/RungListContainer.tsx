@@ -21,9 +21,11 @@ export default function RungListContainer(props: RungListContainerProps) {
   const [movingRungId, setMovingRungId] = useState<string>(); // Id of moving rung
   const [droppedSpacer, setDroppedSpacer] = useState<number>(); // prevOrder
   const [editingRungId, setEditingRungId] = useState<string>(); // Id of editing rung
+
   const router = useRouter();
 
-  const { cursor } = useCursor(props.rungList.length, false);
+  const cursorControls = useCursor(props.rungList.length, false);
+  const { cursor, setCursor } = cursorControls;
 
   const { moveKey } = useKeyboardControls(
     props.rungList,
@@ -32,8 +34,8 @@ export default function RungListContainer(props: RungListContainerProps) {
     props.loading,
     {
       enterRung,
-      setRungToEdit: setRungToEdit,
-      cancelEdit: () => setEditingRungId(undefined),
+      setRungToEdit,
+      cancelEdit: () => setRungToEdit(undefined),
       goBack: () => router.back(),
       addNewRung,
       deleteRung: handleRungDelete,
@@ -47,7 +49,8 @@ export default function RungListContainer(props: RungListContainerProps) {
     props.setParentRung,
     props.rungList,
     props.setRungList,
-    handleError
+    handleError,
+    cursorControls
   );
 
   useEffect(() => {
@@ -66,8 +69,8 @@ export default function RungListContainer(props: RungListContainerProps) {
 
   function addNewRung(order: number) {
     const newRung = rungActions.createNewRung(order);
-    if (newRung) return setEditingRungId(newRung.id);
-    if (props.rungList.length) setEditingRungId(props.rungList[0].id);
+    if (newRung) return setRungToEdit(newRung);
+    if (props.rungList.length) setRungToEdit(props.rungList[0]);
   }
 
   async function handleMove() {
@@ -77,17 +80,22 @@ export default function RungListContainer(props: RungListContainerProps) {
   }
 
   function handleRungClick(rung: rung) {
-    console.log(router);
-    if (!rung.new) enterRung(rung.id);
-    else setRungToEdit(rung.id);
+    if (!rung.new) enterRung(rung);
+    else setRungToEdit(rung);
   }
 
-  function setRungToEdit(rungId: string) {
-    setMovingRungId(rungId);
+  function setRungToEdit(rung?: rung) {
+    if (!rung) {
+      setEditingRungId(undefined);
+      return;
+    }
+    setCursor(rung.order);
+    setEditingRungId(rung.id);
   }
-  function enterRung(rungId: string) {
+
+  function enterRung(rung: rung) {
     const { user } = router.query;
-    router.push(`/${user}/${rungId}`);
+    router.push(`/${user}/${rung.id}`);
   }
 
   async function handleRungEdit(editedRung: rung) {
@@ -95,8 +103,8 @@ export default function RungListContainer(props: RungListContainerProps) {
     await rungActions.editRung(editedRung);
   }
 
-  async function handleRungDelete(rungId: string) {
-    await rungActions.deleteRung(rungId);
+  async function handleRungDelete(rung: rung) {
+    await rungActions.deleteRung(rung.id);
   }
 
   return (
@@ -111,6 +119,7 @@ export default function RungListContainer(props: RungListContainerProps) {
       addNewRung={addNewRung}
       loading={props.loading}
       cursor={cursor}
+      moveKey={moveKey}
     />
   );
 }

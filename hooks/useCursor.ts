@@ -1,14 +1,33 @@
 import { useEffect, useRef, useState } from "react";
+import { specialKeys } from "./useKeyboardControls";
 import useKeyHold from "./useKeyHold";
 
 const timeoutMs = 750;
 const intervalMs = 80;
-export type cursorTypes = "ladder" | "note";
-export default function useCursor(maxLength: number, disabled: boolean) {
+export type cursorControls = {
+  cursor: number;
+  prevCursor: number;
+  setCursor: (newCursor: number) => void;
+  incrementCursor: (incrementBy: number) => void;
+};
+
+export default function useCursor(
+  maxLength: number,
+  disabled: boolean
+): cursorControls {
+  const [prevCursor, _setPrevCursor] = useState<number>(0);
+  const prevCursorRef = useRef(prevCursor);
+
+  function setPrevCursor(newCursor: number) {
+    prevCursorRef.current = newCursor;
+    _setPrevCursor(newCursor);
+  }
+
   const [cursor, _setCursor] = useState<number>(0);
   const cursorRef = useRef(cursor);
 
   function setCursor(newCursor: number) {
+    setPrevCursor(cursorRef.current);
     cursorRef.current = newCursor;
     _setCursor(newCursor);
   }
@@ -26,9 +45,10 @@ export default function useCursor(maxLength: number, disabled: boolean) {
   const upPress = useKeyHold("ArrowUp");
   const downPress = useKeyHold("ArrowDown");
   const shift = useKeyHold("Shift");
+  const moveKey = useKeyHold(specialKeys.MOVE_KEY);
 
   useEffect(() => {
-    if (disabled || !maxLength) return;
+    if (disabled || !maxLength || moveKey) return;
     let cursorPress = upPress || downPress;
     if (shift) {
       if (upPress) {
@@ -84,5 +104,10 @@ export default function useCursor(maxLength: number, disabled: boolean) {
     };
   }, [upPress, downPress]);
 
-  return { cursor, incrementCursor, setCursor };
+  return {
+    cursor: cursorRef.current,
+    prevCursor: prevCursorRef.current,
+    incrementCursor,
+    setCursor,
+  };
 }

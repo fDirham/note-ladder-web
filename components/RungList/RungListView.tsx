@@ -10,11 +10,12 @@ type RungListViewProps = {
   setMovingRungId: (movingId: string) => void;
   onRungClick: (rung: rung) => void;
   onRungEdit: (editedRung: rung) => void;
-  onRungDelete: (rungId: string) => void;
+  onRungDelete: (rung: rung) => void;
   addNewRung: (order: number) => void;
   editingRungId: string;
   loading: boolean;
   cursor: number;
+  moveKey: boolean;
 };
 
 export default function RungsListView(props: RungListViewProps) {
@@ -43,6 +44,7 @@ export default function RungsListView(props: RungListViewProps) {
               onDelete={props.onRungDelete}
               editing={rung.id === props.editingRungId}
               selected={rung.order === props.cursor}
+              moveKey={props.moveKey}
             />
             <RungSpacer
               key={`spacer-${index}`}

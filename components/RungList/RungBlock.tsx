@@ -15,9 +15,10 @@ type RungBlockProps = {
   setMovingRungId: (rungId: string) => void;
   onClick: (rung: rung) => void;
   onEdit: (newRung: rung) => void;
-  onDelete: (rungId: string) => void;
+  onDelete: (rung: rung) => void;
   editing: boolean;
   selected: boolean;
+  moveKey: boolean;
 };
 
 export default function RungBlock(props: RungBlockProps) {
@@ -31,7 +32,7 @@ export default function RungBlock(props: RungBlockProps) {
   }));
 
   useEffect(() => {
-    if (!props.editing && !stateContent) props.onDelete(props.rung.id);
+    if (!props.editing && !stateContent) props.onDelete(props.rung);
     if (props.editing) inputRef.current.focus();
   }, [props.editing]);
 
@@ -39,6 +40,10 @@ export default function RungBlock(props: RungBlockProps) {
     const toSet = isDragging ? props.rung.id : undefined;
     props.setMovingRungId(toSet);
   }, [isDragging]);
+
+  useEffect(() => {
+    if (props.selected) scrollToBlock();
+  }, [props.selected]);
 
   function scrollToBlock() {
     const windowHeight = window.innerHeight;
@@ -74,7 +79,6 @@ export default function RungBlock(props: RungBlockProps) {
     setStateContent(value);
   }
 
-  // ${props.moveKey && props.selected ? styles.draggingContainer : ""}
   return (
     <div
       ref={drag}
@@ -83,6 +87,8 @@ export default function RungBlock(props: RungBlockProps) {
       ${isDragging ? styles.draggingContainer : ""}
       ${props.rung.new ? styles.newContainer : ""}
       ${props.selected ? styles.selectedContainer : ""}
+      ${props.moveKey && props.selected ? styles.draggingContainer : ""}
+      ${props.editing ? styles.editingContainer : ""}
       `}
       onBlur={handleSubmit}
       onClick={() => props.onClick(props.rung)}
