@@ -14,6 +14,7 @@ type RungListViewProps = {
   addNewRung: (order: number) => void;
   editingRungId: string;
   loading: boolean;
+  cursor: number;
 };
 
 export default function RungsListView(props: RungListViewProps) {
@@ -41,6 +42,7 @@ export default function RungsListView(props: RungListViewProps) {
               onEdit={props.onRungEdit}
               onDelete={props.onRungDelete}
               editing={rung.id === props.editingRungId}
+              selected={rung.order === props.cursor}
             />
             <RungSpacer
               key={`spacer-${index}`}

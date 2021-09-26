@@ -17,6 +17,7 @@ type RungBlockProps = {
   onEdit: (newRung: rung) => void;
   onDelete: (rungId: string) => void;
   editing: boolean;
+  selected: boolean;
 };
 
 export default function RungBlock(props: RungBlockProps) {
@@ -73,7 +74,6 @@ export default function RungBlock(props: RungBlockProps) {
     setStateContent(value);
   }
 
-  // ${props.selected ? styles.selectedContainer : ""}
   // ${props.moveKey && props.selected ? styles.draggingContainer : ""}
   return (
     <div
@@ -82,6 +82,7 @@ export default function RungBlock(props: RungBlockProps) {
       ${styles.container}
       ${isDragging ? styles.draggingContainer : ""}
       ${props.rung.new ? styles.newContainer : ""}
+      ${props.selected ? styles.selectedContainer : ""}
       `}
       onBlur={handleSubmit}
       onClick={() => props.onClick(props.rung)}

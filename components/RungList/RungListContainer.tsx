@@ -1,5 +1,8 @@
 import { customErrorObj } from "components/constants/errors";
 import { authStateType, useAuthState } from "globalStates/useAuthStore";
+import useCursor from "hooks/useCursor";
+import useRungCursor from "hooks/useCursor";
+import useKeyboardControls from "hooks/useKeyboardControls";
 import useRungActions from "hooks/useRungActions";
 import { useRouter } from "next/dist/client/router";
 import React, { useEffect, useState } from "react";
@@ -19,6 +22,25 @@ export default function RungListContainer(props: RungListContainerProps) {
   const [droppedSpacer, setDroppedSpacer] = useState<number>(); // prevOrder
   const [editingRungId, setEditingRungId] = useState<string>(); // Id of editing rung
   const router = useRouter();
+
+  const { cursor } = useCursor(props.rungList.length, false);
+
+  const { moveKey } = useKeyboardControls(
+    props.rungList,
+    cursor,
+    !!editingRungId,
+    props.loading,
+    {
+      enterRung,
+      setRungToEdit: setRungToEdit,
+      cancelEdit: () => setEditingRungId(undefined),
+      goBack: () => router.back(),
+      addNewRung,
+      deleteRung: handleRungDelete,
+      setMovingRungId,
+      setDroppedSpacer,
+    }
+  );
 
   const rungActions = useRungActions(
     props.parentRung,
@@ -56,9 +78,16 @@ export default function RungListContainer(props: RungListContainerProps) {
 
   function handleRungClick(rung: rung) {
     console.log(router);
+    if (!rung.new) enterRung(rung.id);
+    else setRungToEdit(rung.id);
+  }
+
+  function setRungToEdit(rungId: string) {
+    setMovingRungId(rungId);
+  }
+  function enterRung(rungId: string) {
     const { user } = router.query;
-    if (!rung.new) router.push(`/${user}/${rung.id}`);
-    else setEditingRungId(rung.id);
+    router.push(`/${user}/${rungId}`);
   }
 
   async function handleRungEdit(editedRung: rung) {
@@ -81,6 +110,7 @@ export default function RungListContainer(props: RungListContainerProps) {
       onRungDelete={handleRungDelete}
       addNewRung={addNewRung}
       loading={props.loading}
+      cursor={cursor}
     />
   );
 }
