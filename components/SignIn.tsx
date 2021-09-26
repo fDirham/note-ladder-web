@@ -7,6 +7,7 @@ import styles from "./SignIn.module.scss"
 
 type SignInProps = {
   onSignUp: () => void
+  setLoading: (newLoading: boolean) => void
 }
 
 export default function SignIn(props: SignInProps) {
@@ -22,9 +23,12 @@ export default function SignIn(props: SignInProps) {
     if (!email || !validateEmail(email)) return setError("Invalid email")
     if (!password) return setError("Input password")
 
+    props.setLoading(true)
     const user = await AuthController.logIn(email, password)
-    if (!user.uid) return setError("Invalid credentials")
-    authState.setState(user)
+
+    if (!user.uid) setError("Invalid credentials")
+    else authState.setState(user)
+    props.setLoading(false)
   }
 
   return (

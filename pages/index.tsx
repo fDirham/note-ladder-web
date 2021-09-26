@@ -11,6 +11,7 @@ import styles from "../styles/Home.module.scss"
 
 export default function Home() {
   const [signUp, setSignUp] = useState<boolean>(false)
+  const [loading, setLoading] = useState<boolean>(false)
   const authState: authStateType = useAuthState()
   const router = useRouter()
 
@@ -22,14 +23,14 @@ export default function Home() {
   return (
     <div className={styles.container}>
       <main className={styles.main}>
-        <PageWrapper loading={false}>
+        <PageWrapper loading={loading}>
           <h1 className={styles.title}>Note Ladder</h1>
 
           <div>
             {signUp ? (
-              <SignUp onSignIn={() => setSignUp(false)} />
+              <SignUp onSignIn={() => setSignUp(false)} setLoading={setLoading} />
             ) : (
-              <SignIn onSignUp={() => setSignUp(true)} />
+              <SignIn onSignUp={() => setSignUp(true)} setLoading={setLoading} />
             )}
           </div>
         </PageWrapper>

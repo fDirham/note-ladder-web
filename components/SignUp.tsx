@@ -7,6 +7,7 @@ import styles from "./SignUp.module.scss"
 
 type SignUpProps = {
   onSignIn: () => void
+  setLoading: (newLoading: boolean) => void
 }
 
 export default function SignUp(props: SignUpProps) {
@@ -32,7 +33,12 @@ export default function SignUp(props: SignUpProps) {
     )
     if (!validateRes.displayName) return setError("Display name already used")
     if (!validateRes.email) return setError("Email already used")
+
+
+    props.setLoading(true)
     const signUpRes = await AuthController.signUp(email, password, displayName)
+    props.setLoading(false)
+
     if (!signUpRes.user) return setError("Error signing up, try again later")
     window.alert("Success! Please sign in.")
     props.onSignIn()
