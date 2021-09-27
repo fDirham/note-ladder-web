@@ -2,6 +2,7 @@ import customErrors, { customErrorObj } from "components/constants/errors";
 import RungController from "controllers/RungController";
 import { authStateType, useAuthState } from "globalStates/useAuthStore";
 import { useRouter } from "next/dist/client/router";
+import { useEffect, useRef } from "react";
 import { rung } from "types/rungs";
 import { cursorControls } from "./useCursor";
 
@@ -17,15 +18,27 @@ export default function useRungActions(
   const router = useRouter();
   const { cursor, prevCursor, incrementCursor, setCursor } = cursorControls;
 
+  const reorderTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
+
+  useEffect(() => {
+    return () => {
+      if (reorderTimeoutRef.current) clearTimeout(reorderTimeoutRef.current);
+    };
+  }, []);
+
   function isAuthor(author: string) {
     if (!authState.uid) return false;
     return authState.uid === author;
   }
 
   function fixRungListOrder(newRungs: rung[]) {
+    const orderArray = [];
     newRungs.forEach((rung, index) => {
       rung.order = index;
+      orderArray.push(rung.alias);
     });
+
+    return orderArray;
   }
 
   function createNewRung(order: number) {
@@ -118,8 +131,7 @@ export default function useRungActions(
       1
     );
 
-    fixRungListOrder(newRungs);
-    console.log(newRungs);
+    const orderArray = fixRungListOrder(newRungs);
     setRungList(newRungs);
 
     const actualNewOrder = newRungs.findIndex((e) => e.id === rungToMove.id);
@@ -127,13 +139,21 @@ export default function useRungActions(
     if (oldOrder === actualNewOrder) return;
     setCursor(actualNewOrder);
 
-    const accessToken = await authState.getAccessToken();
-    const movedRung = await RungController.reorderRung(
-      rungToMove.id,
-      actualNewOrder,
-      accessToken
-    );
-    if (!movedRung) return handleError(customErrors.FAILED_MOVE);
+    // Set time out to apply changes
+    if (reorderTimeoutRef.current) {
+      clearTimeout(reorderTimeoutRef.current);
+    }
+    const reorderTimeoutMs = 3000;
+    reorderTimeoutRef.current = setTimeout(async () => {
+      const accessToken = await authState.getAccessToken();
+
+      const movedRung = await RungController.reorderRungChildren(
+        rungToMove.parent,
+        orderArray,
+        accessToken
+      );
+      if (!movedRung) return handleError(customErrors.FAILED_MOVE);
+    }, reorderTimeoutMs);
 
     return rungToMove;
   }

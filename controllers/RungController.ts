@@ -42,6 +42,32 @@ export default class RungController {
     }
   }
 
+  static async reorderRungChildren(
+    rungId: string,
+    orderArray: number[],
+    accessToken: string
+  ): Promise<rung | null> {
+    try {
+      const config = {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      };
+
+      const reorderRes = await axios.put(
+        `${process.env.NEXT_PUBLIC_API_URL}/rung/children/reorder/${rungId}`,
+        { orderArray },
+        config
+      );
+
+      return reorderRes.data.children as rung;
+    } catch (error) {
+      console.log(error);
+      console.log(error.response);
+      return null;
+    }
+  }
+
   static async reorderRung(
     rungId: string,
     order: number,
