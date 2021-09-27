@@ -2,6 +2,7 @@ import React, {
   ChangeEvent,
   ChangeEventHandler,
   FormEvent,
+  useEffect,
   useState,
 } from "react";
 import { maxNoteContentLength } from "utilities/constants";
@@ -16,6 +17,10 @@ type EditableLadderTitleProps = {
 export default function EditableLadderTitle(props: EditableLadderTitleProps) {
   const [editing, setEditing] = useState<boolean>(false);
   const [currentTitle, setCurrentTitle] = useState<string>(props.title);
+
+  useEffect(() => {
+    setCurrentTitle(props.title);
+  }, [props.title]);
 
   function handleSubmit(e?: FormEvent) {
     if (e) e.preventDefault();

@@ -1,37 +1,42 @@
-import { cursorStateType, useCursorState } from "globalStates/useCursorStore";
 import { useEffect, useRef, useState } from "react";
 import { specialKeys } from "./useKeyboardControls";
 import useKeyHold from "./useKeyHold";
 
 const timeoutMs = 750;
 const intervalMs = 80;
-export type cursorTypes = "ladder" | "note";
-export default function useRungCursor(
-  type: cursorTypes,
+export type cursorControls = {
+  cursor: number;
+  prevCursor: number;
+  setCursor: (newCursor: number) => void;
+  incrementCursor: (incrementBy: number) => void;
+};
+
+export default function useCursor(
   maxLength: number,
   disabled: boolean
-) {
-  const cursorState: cursorStateType = useCursorState();
-  const {
-    noteCursor,
-    incrementNoteCursor,
-    ladderCursor,
-    incrementLadderCursor,
-    setState,
-  } = cursorState;
+): cursorControls {
+  const [prevCursor, _setPrevCursor] = useState<number>(0);
+  const prevCursorRef = useRef(prevCursor);
 
-  let cursor: number;
-  let incrementCursor: (incrementBy: number, maxLength?: number) => void;
+  function setPrevCursor(newCursor: number) {
+    prevCursorRef.current = newCursor;
+    _setPrevCursor(newCursor);
+  }
 
-  switch (type) {
-    case "ladder":
-      cursor = ladderCursor;
-      incrementCursor = incrementLadderCursor;
-      break;
-    case "note":
-      cursor = noteCursor;
-      incrementCursor = incrementNoteCursor;
-      break;
+  const [cursor, _setCursor] = useState<number>(0);
+  const cursorRef = useRef(cursor);
+
+  function setCursor(newCursor: number) {
+    setPrevCursor(cursorRef.current);
+    cursorRef.current = newCursor;
+    _setCursor(newCursor);
+  }
+
+  function incrementCursor(incrementBy: number) {
+    let newCursor = cursorRef.current + incrementBy;
+    if (newCursor >= maxLength) newCursor = 0;
+    if (newCursor < 0) newCursor = maxLength - 1;
+    setCursor(newCursor);
   }
 
   const cursorMoveTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
@@ -55,23 +60,23 @@ export default function useRungCursor(
       return;
     }
     if (upPress) {
-      incrementCursor(-1, maxLength);
+      incrementCursor(-1);
       if (!cursorMoveTimeoutRef.current)
         cursorMoveTimeoutRef.current = setTimeout(() => {
           if (!cursorMoveIntervalRef.current)
             cursorMoveIntervalRef.current = setInterval(() => {
-              incrementCursor(-1, maxLength);
+              incrementCursor(-1);
             }, intervalMs);
         }, timeoutMs);
     }
 
     if (downPress) {
-      incrementCursor(1, maxLength);
+      incrementCursor(1);
       if (!cursorMoveTimeoutRef.current)
         cursorMoveTimeoutRef.current = setTimeout(() => {
           if (!cursorMoveIntervalRef.current)
             cursorMoveIntervalRef.current = setInterval(() => {
-              incrementCursor(1, maxLength);
+              incrementCursor(1);
             }, intervalMs);
         }, timeoutMs);
     }
@@ -99,5 +104,10 @@ export default function useRungCursor(
     };
   }, [upPress, downPress]);
 
-  return { cursor, incrementCursor };
+  return {
+    cursor: cursorRef.current,
+    prevCursor: prevCursorRef.current,
+    incrementCursor,
+    setCursor,
+  };
 }
