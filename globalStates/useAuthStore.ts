@@ -43,7 +43,7 @@ export const useAuthState = createStore(
       displayName: initialStoreValues.displayName,
       uid: initialStoreValues.uid,
       accessToken: initialStoreValues.accessToken,
-      getAccessToken: getAccessToken,
+      getAccessToken: () => getAccessToken(() => set(initialStoreValues)),
       setState: set,
       getState: get,
       resetState: () => set(initialStoreValues),
