@@ -68,7 +68,7 @@ export default function RungBlock(props: RungBlockProps) {
   }
 
   function validateRung(rung: rung) {
-    return rung.content.length < 100;
+    return rung.content.length < 30;
   }
 
   function handleChange(e: ChangeEvent<HTMLInputElement>) {
