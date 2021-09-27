@@ -79,6 +79,10 @@ export default function RungBlock(props: RungBlockProps) {
     setStateContent(value);
   }
 
+  function handleClick() {
+    if (props.editing) return;
+    props.onClick(props.rung);
+  }
   return (
     <div
       ref={drag}
@@ -91,7 +95,7 @@ export default function RungBlock(props: RungBlockProps) {
       ${props.editing ? styles.editingContainer : ""}
       `}
       onBlur={handleSubmit}
-      onClick={() => props.onClick(props.rung)}
+      onClick={handleClick}
     >
       <form onSubmit={handleSubmit}>
         <input

@@ -170,7 +170,7 @@ export default function useRungActions(
   }
 
   async function deleteRung(rungId: string) {
-    if (rungList.length === 1 && rungList[0].new) router.back();
+    if (rungList.length === 1 && rungList[0].new) return;
 
     const newRungs = [...rungList];
     const rungIndex = newRungs.findIndex((e) => e.id === rungId);

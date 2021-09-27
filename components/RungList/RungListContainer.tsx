@@ -24,7 +24,7 @@ export default function RungListContainer(props: RungListContainerProps) {
 
   const router = useRouter();
 
-  const cursorControls = useCursor(props.rungList.length, false);
+  const cursorControls = useCursor(props.rungList.length, !!editingRungId);
   const { cursor, setCursor } = cursorControls;
 
   const { moveKey } = useKeyboardControls(
@@ -36,7 +36,7 @@ export default function RungListContainer(props: RungListContainerProps) {
       enterRung,
       setRungToEdit,
       cancelEdit: () => setRungToEdit(undefined),
-      goBack: () => router.back(),
+      goBack,
       addNewRung,
       deleteRung: handleRungDelete,
       setMovingRungId,
@@ -62,6 +62,11 @@ export default function RungListContainer(props: RungListContainerProps) {
   useEffect(() => {
     if (movingRungId && typeof droppedSpacer === "number") handleMove();
   }, [droppedSpacer, movingRungId]);
+
+  function goBack() {
+    setRungToEdit(undefined);
+    router.back();
+  }
 
   function handleError(customErrorObj: customErrorObj) {
     window.alert(customErrorObj.text);
