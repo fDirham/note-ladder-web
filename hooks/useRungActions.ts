@@ -4,6 +4,7 @@ import { authStateType, useAuthState } from "globalStates/useAuthStore";
 import { useRouter } from "next/dist/client/router";
 import { useEffect, useRef } from "react";
 import { rung } from "types/rungs";
+import { createParenthesizedType } from "typescript";
 import { cursorControls } from "./useCursor";
 
 export default function useRungActions(
@@ -19,10 +20,15 @@ export default function useRungActions(
   const { cursor, prevCursor, incrementCursor, setCursor } = cursorControls;
 
   const reorderTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
+  const reorderTimeoutFunctionRef = useRef<() => void>();
 
   useEffect(() => {
     return () => {
-      if (reorderTimeoutRef.current) clearTimeout(reorderTimeoutRef.current);
+      if (reorderTimeoutRef.current) {
+        clearTimeout(reorderTimeoutRef.current);
+        const { current: timeoutFunction } = reorderTimeoutFunctionRef;
+        if (timeoutFunction) timeoutFunction();
+      }
     };
   }, []);
 
@@ -140,22 +146,27 @@ export default function useRungActions(
     setCursor(actualNewOrder);
 
     // Set time out to apply changes
+    applyDelayedReorder(rungToMove.parent, orderArray);
+
+    return rungToMove;
+  }
+
+  async function applyDelayedReorder(parentId: string, orderArray: number[]) {
+    // Set time out to apply changes
     if (reorderTimeoutRef.current) {
       clearTimeout(reorderTimeoutRef.current);
     }
     const reorderTimeoutMs = 3000;
+    const accessToken = await authState.getAccessToken();
+
+    reorderTimeoutFunctionRef.current = () => {
+      RungController.reorderRungChildren(parentId, orderArray, accessToken);
+    };
+
     reorderTimeoutRef.current = setTimeout(async () => {
-      const accessToken = await authState.getAccessToken();
-
-      const movedRung = await RungController.reorderRungChildren(
-        rungToMove.parent,
-        orderArray,
-        accessToken
-      );
-      if (!movedRung) return handleError(customErrors.FAILED_MOVE);
+      RungController.reorderRungChildren(parentId, orderArray, accessToken);
+      reorderTimeoutRef.current = undefined;
     }, reorderTimeoutMs);
-
-    return rungToMove;
   }
 
   async function deleteRung(rungId: string) {
