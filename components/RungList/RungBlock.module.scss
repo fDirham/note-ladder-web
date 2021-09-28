@@ -7,17 +7,34 @@
     width: 100%;
     height: 100%;
     border: none;
+    display: flex;
+    flex-direction: row;
+    border: none;
+    border-radius: 5px;
+    background-color: white;
+    overflow: hidden;
 
     input {
+      padding: 0.8rem;
       outline: none;
       width: 100%;
       height: 100%;
-      padding: 0.8rem;
-      background-color: white;
-      border-radius: 5px;
-      border: none;
       font-family: $fontFamilyText;
       font-size: 1rem;
+      border: none;
+      background-color: transparent;
+    }
+
+    .containerIndicator {
+      width: 3.4rem;
+      background-color: $accentColor;
+      height: auto;
+      font-family: $fontFamilyTitle;
+      color: white;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
   }
 }
@@ -25,9 +42,7 @@
 .draggingContainer {
   opacity: 0.3;
   form {
-    input {
-      border-color: $accentColor !important;
-    }
+    border-color: $accentColor !important;
   }
 }
 
@@ -37,21 +52,20 @@
 
 .editingContainer {
   form {
-    input {
-      border-color: $accentColor !important;
-    }
+    border-color: $accentColor !important;
   }
 }
 
 .selectedContainer {
   form {
+    border-style: solid;
+    border-width: 2px;
+    border-color: black;
+
     input {
       padding-top: 1.2rem;
       padding-bottom: 1.2rem;
       font-weight: 600;
-      border-style: solid;
-      border-width: 2px;
-      border-color: black;
     }
   }
 }
