@@ -54,6 +54,7 @@ export default function UserPage() {
       parent: "",
       order: 0,
       countChildren: retrievedUser.countLadders,
+      trueCountChildren: retrievedUser.trueCountLadders,
       author: retrievedUser.uid,
     };
     setParentRung(newParentRung);

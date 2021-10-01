@@ -5,5 +5,6 @@ export type user = {
   email: string;
   uid: string;
   countLadders: number;
+  trueCountLadders: number;
   ladders?: rung[]; // Full of ladder names
 };

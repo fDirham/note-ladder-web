@@ -57,6 +57,7 @@ export default function useRungActions(
       parent: parentRung.id,
       order,
       countChildren: 0,
+      trueCountChildren: 0,
       author: authState.uid,
       new: true,
     };
@@ -67,6 +68,7 @@ export default function useRungActions(
     const newParentRung = {
       ...parentRung,
       countChildren: parentRung.countChildren + 1,
+      trueCountChildren: parentRung.trueCountChildren + 1,
     };
     setParentRung(newParentRung);
 
@@ -124,6 +126,7 @@ export default function useRungActions(
       parent: "",
       order: 0,
       countChildren: 0,
+      trueCountChildren: 0,
       author: authState.uid,
     };
     newRungs.splice(rungIndex, 1, tempRung);
@@ -180,6 +183,12 @@ export default function useRungActions(
     fixRungListOrder(newRungs);
     setRungList(newRungs);
     setCursor(prevCursor);
+
+    const newParentRung = {
+      ...parentRung,
+      trueCountChildren: parentRung.trueCountChildren - 1,
+    };
+    setParentRung(newParentRung);
 
     if (!rungToDelete.new) {
       const accessToken = await authState.getAccessToken();
