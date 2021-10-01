@@ -5,6 +5,7 @@ export type rung = {
   parent: string;
   order: number;
   countChildren: number;
+  trueCountChildren: number;
   author: string;
   new?: boolean;
   children?: rung[];

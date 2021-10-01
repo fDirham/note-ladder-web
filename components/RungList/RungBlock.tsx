@@ -4,84 +4,84 @@ import React, {
   useEffect,
   useRef,
   useState,
-} from "react"
-import { useDrag } from "react-dnd"
-import { itemTypes } from "types/dnd"
-import { rung } from "types/rungs"
-import styles from "./RungBlock.module.scss"
+} from "react";
+import { useDrag } from "react-dnd";
+import { itemTypes } from "types/dnd";
+import { rung } from "types/rungs";
+import styles from "./RungBlock.module.scss";
 
 type RungBlockProps = {
-  rung: rung
-  setMovingRungId: (rungId: string) => void
-  onClick: (rung: rung) => void
-  onEdit: (newRung: rung) => void
-  onDelete: (rung: rung) => void
-  editing: boolean
-  selected: boolean
-  moveKey: boolean
-}
+  rung: rung;
+  setMovingRungId: (rungId: string) => void;
+  onClick: (rung: rung) => void;
+  onEdit: (newRung: rung) => void;
+  onDelete: (rung: rung) => void;
+  editing: boolean;
+  selected: boolean;
+  moveKey: boolean;
+};
 
 export default function RungBlock(props: RungBlockProps) {
-  const [stateContent, setStateContent] = useState<string>(props.rung.content)
-  const inputRef = useRef(null)
+  const [stateContent, setStateContent] = useState<string>(props.rung.content);
+  const inputRef = useRef(null);
   const [{ isDragging }, drag] = useDrag(() => ({
     type: itemTypes.LADDER,
     collect: (monitor) => ({
       isDragging: !!monitor.isDragging(),
     }),
-  }))
+  }));
 
   useEffect(() => {
-    if (!props.editing && !stateContent) props.onDelete(props.rung)
-    if (props.editing) inputRef.current.focus()
-  }, [props.editing])
+    if (!props.editing && !stateContent) props.onDelete(props.rung);
+    if (props.editing) inputRef.current.focus();
+  }, [props.editing]);
 
   useEffect(() => {
-    const toSet = isDragging ? props.rung.id : undefined
-    props.setMovingRungId(toSet)
-  }, [isDragging])
+    const toSet = isDragging ? props.rung.id : undefined;
+    props.setMovingRungId(toSet);
+  }, [isDragging]);
 
   useEffect(() => {
-    if (props.selected) scrollToBlock()
-  }, [props.selected])
+    if (props.selected) scrollToBlock();
+  }, [props.selected]);
 
   function scrollToBlock() {
-    const windowHeight = window.innerHeight
-    const boundingClientRectTop = inputRef.current.getBoundingClientRect().top
-    const yOffset = 150
+    const windowHeight = window.innerHeight;
+    const boundingClientRectTop = inputRef.current.getBoundingClientRect().top;
+    const yOffset = 150;
     const needScroll =
       boundingClientRectTop > windowHeight - yOffset ||
-      boundingClientRectTop < yOffset
+      boundingClientRectTop < yOffset;
 
-    if (!needScroll) return
+    if (!needScroll) return;
 
-    const y = boundingClientRectTop + window.pageYOffset - yOffset
-    window.scrollTo({ top: y, behavior: "smooth" })
+    const y = boundingClientRectTop + window.pageYOffset - yOffset;
+    window.scrollTo({ top: y, behavior: "smooth" });
   }
 
   async function handleSubmit(e: FormEvent) {
-    if (e) e.preventDefault()
-    if (!props.editing) return
-    const newRung = { ...props.rung }
-    newRung.content = stateContent
-    props.onEdit(newRung)
+    if (e) e.preventDefault();
+    if (!props.editing) return;
+    const newRung = { ...props.rung };
+    newRung.content = stateContent;
+    props.onEdit(newRung);
   }
 
   function validateRung(rung: rung) {
-    return rung.content.length < 30
+    return rung.content.length < 30;
   }
 
   function handleChange(e: ChangeEvent<HTMLInputElement>) {
-    const { value } = e.target
-    const newRung = { ...props.rung }
-    newRung.content = value
-    if (!validateRung(newRung)) return
-    setStateContent(value)
+    const { value } = e.target;
+    const newRung = { ...props.rung };
+    newRung.content = value;
+    if (!validateRung(newRung)) return;
+    setStateContent(value);
   }
 
   function handleClick() {
-    if (props.editing) return
-    props.onClick(props.rung)
+    if (props.editing) return;
+    props.onClick(props.rung);
   }
   return (
     <div
@@ -106,12 +106,12 @@ export default function RungBlock(props: RungBlockProps) {
           placeholder={"New note"}
           disabled={!props.editing}
         />
-        {!!props.rung.countChildren && (
+        {!!props.rung.trueCountChildren && (
           <div className={styles.containerIndicator}>
-            {props.rung.countChildren}
+            {props.rung.trueCountChildren}
           </div>
         )}
       </form>
     </div>
-  )
+  );
 }
