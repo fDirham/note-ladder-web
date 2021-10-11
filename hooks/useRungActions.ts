@@ -182,7 +182,8 @@ export default function useRungActions(
     newRungs.splice(rungIndex, 1);
     fixRungListOrder(newRungs);
     setRungList(newRungs);
-    setCursor(prevCursor);
+    if (rungIndex < prevCursor) setCursor(prevCursor - 1);
+    else setCursor(prevCursor);
 
     const newParentRung = {
       ...parentRung,
