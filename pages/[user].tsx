@@ -8,17 +8,19 @@ import { user } from "types/users";
 import PageWrapper from "components/PageWrapper";
 import RungList from "components/RungList";
 import { rung } from "types/rungs";
+import { cacheStateType, useCacheState } from "globalStates/useCacheStore";
 
 export default function UserPage() {
   const router = useRouter();
   const { user: currentDisplayName } = router.query;
   const authState: authStateType = useAuthState();
+  const cacheState: cacheStateType = useCacheState();
 
   const [currentUser, setCurrentUser] = useState<user>();
   const [rungList, setRungList] = useState<rung[]>([]);
   const [parentRung, setParentRung] = useState<rung>();
   const [notFound, setNotFound] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(false);
   const _notMounted = useRef(false);
 
   useEffect(() => {
@@ -38,6 +40,16 @@ export default function UserPage() {
     )
       return;
 
+    // Get cache
+    const cached = cacheState.cachedRungTable[""];
+    if (cached) {
+      setParentRung(cached.parentRung);
+      setRungList(cached.rungList);
+      setCurrentUser(cached.currentUser);
+      setLoading(false);
+    } else setLoading(true);
+
+    // Get actual user
     const retrievedUser = await UserController.getUser(
       currentDisplayName as string
     );
@@ -60,6 +72,10 @@ export default function UserPage() {
     setParentRung(newParentRung);
     setRungList(newRungList);
     setCurrentUser(retrievedUser);
+
+    // Set cache
+    cacheState.setCachedRungRow("", newParentRung, newRungList, retrievedUser);
+
     if (notFound) setNotFound(false);
     setLoading(false);
   }

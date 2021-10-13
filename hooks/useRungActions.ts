@@ -1,6 +1,7 @@
 import customErrors, { customErrorObj } from "components/constants/errors";
 import RungController from "controllers/RungController";
 import { authStateType, useAuthState } from "globalStates/useAuthStore";
+import { cacheStateType, useCacheState } from "globalStates/useCacheStore";
 import { useRouter } from "next/dist/client/router";
 import { useEffect, useRef } from "react";
 import { rung } from "types/rungs";
@@ -11,11 +12,13 @@ export default function useRungActions(
   parentRung: rung,
   setParentRung: (newRung: rung) => void,
   rungList: rung[],
-  setRungList: (newRungs: rung[]) => void,
+  _setRungList: (newRungs: rung[]) => void,
   handleError: (error: customErrorObj) => void,
   cursorControls: cursorControls
 ) {
   const authState: authStateType = useAuthState();
+  const cacheState: cacheStateType = useCacheState();
+
   const router = useRouter();
   const { cursor, prevCursor, incrementCursor, setCursor } = cursorControls;
 
@@ -45,6 +48,17 @@ export default function useRungActions(
     });
 
     return orderArray;
+  }
+
+  function setRungList(newRungList: rung[]) {
+    const currentCachedRung = cacheState.cachedRungTable[parentRung.id];
+    cacheState.setCachedRungRow(
+      parentRung.id,
+      currentCachedRung.parentRung,
+      newRungList,
+      currentCachedRung.currentUser
+    );
+    _setRungList(newRungList);
   }
 
   function createNewRung(order: number) {
@@ -108,7 +122,7 @@ export default function useRungActions(
     return editedRung;
   }
 
-  async function reorderRung(movingRungId: string, droppedSpacer: number) {
+  function reorderRung(movingRungId: string, droppedSpacer: number) {
     const newRungs = [...rungList];
     const rungIndex = newRungs.findIndex((e) => e.id === movingRungId);
     const rungToMove = newRungs[rungIndex];
