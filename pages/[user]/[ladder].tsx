@@ -6,15 +6,17 @@ import RungList from "components/RungList";
 import { rung } from "types/rungs";
 import RungController from "controllers/RungController";
 import EditableLadderTitle from "components/EditableLadderTitle";
+import { cacheStateType, useCacheState } from "globalStates/useCacheStore";
 
 export default function UserPage() {
   const router = useRouter();
+  const cacheState: cacheStateType = useCacheState();
   const { user: currentDisplayName, ladder: currentLadderId } = router.query;
 
   const [rungList, setRungList] = useState<rung[]>();
   const [parentRung, setParentRung] = useState<rung>();
   const [notFound, setNotFound] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(false);
   const _notMounted = useRef(false);
 
   useEffect(() => {
@@ -32,7 +34,16 @@ export default function UserPage() {
     if (parentRung) {
       if (parentRung.id === currentLadderId) return;
     }
-    setLoading(true);
+
+    // Get cache
+    const cached = cacheState.cachedRungTable[currentLadderId as string];
+    if (cached) {
+      setParentRung(cached.parentRung);
+      setRungList(cached.rungList);
+      setLoading(false);
+    } else setLoading(true);
+
+    // Get actual ladder
     const retrievedLadder = await RungController.getLadder(
       currentDisplayName as string,
       currentLadderId as string
@@ -47,6 +58,14 @@ export default function UserPage() {
     const newParentRung = retrievedLadder;
     setParentRung(newParentRung);
     setRungList(newRungList);
+
+    // Set cache
+    cacheState.setCachedRungRow(
+      currentLadderId as string,
+      newParentRung,
+      newRungList
+    );
+
     if (notFound) setNotFound(false);
     setLoading(false);
   }
