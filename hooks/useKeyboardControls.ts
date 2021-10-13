@@ -121,7 +121,7 @@ export default function useKeyboardControls(
   }
 
   function handleR() {
-    console.log("reload");
+    if (editingRung || loading) return;
     window.location.reload();
   }
 
